@@ -1,0 +1,6 @@
+﻿services:
+  linkextractor:
+    image: linkextractor
+    build:
+      context: .
+      dockerfile: LinkExtractor/Dockerfile
