@@ -13,6 +13,7 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 . "$SHARED_EXT_SCRIPTS_PATH/shared_functions.sh"
 write_header
 
+dotnet build "$PROJECT_PATH" -c "$CONFIGURATION" || write_error "build" "Build failed."
 
 write_success "build" "Done"
 exit 0

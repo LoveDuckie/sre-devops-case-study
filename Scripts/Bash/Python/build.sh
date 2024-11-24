@@ -23,6 +23,7 @@ fi
 pushd $REPO_ROOT_PATH/Solutions/Python/link-extractor >/dev/null 2>&1
 
 
+
 popd >/dev/null 2>&1
 
 write_success "build" "Done"

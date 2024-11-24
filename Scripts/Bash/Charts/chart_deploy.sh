@@ -20,11 +20,15 @@ function usage() {
     exit 1
 }
 
-while getopts ':c:h?' opt; do
+while getopts ':c:n:h?' opt; do
     case $opt in
         c)
             export CHART_NAME=$OPTARG
             write_warning "chart_deploy" "Chart: \"$CHART_NAME\""
+        ;;
+        n)
+            export CHART_NAMESPACE=$OPTARG
+            write_warning "chart_validate" "Chart Namespace: \"$CHART_NAMESPACE\""
         ;;
         h|?)
             usage

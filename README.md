@@ -10,6 +10,34 @@ The base repository for the technical assignment for the company named *[REDACTE
 
 Find below the repository of the layout, along with descriptions of each path.
 
+```shell
+.
+├── Binaries
+│   └── LinkExtractor
+│       └── Release
+├── Charts
+│   ├── link-extractor-app-job
+│   │   ├── charts
+│   │   └── templates
+│   └── link-extractor-app-pod
+│       ├── charts
+│       └── templates
+├── Scripts
+│   ├── Bash
+│   │   ├── Charts
+│   │   ├── Docker
+│   │   ├── DotNet
+│   │   └── Python
+│   └── PowerShell
+├── Services
+│   └── GitLab
+└── Solutions
+    ├── DotNet
+    │   └── LinkExtractor
+    └── Python
+        └── link-extractor
+```
+
 ## Scripts
 
 Scripts have been defined for automating various processes within this repository. They are defined as `bash` and `pwsh` (PowerShell) scripts, depending on the environment you are using this repository with.
