@@ -17,23 +17,23 @@ PYTHON_PROJECT_PATH=$REPO_ROOT_PATH/Solutions/Python/link-extractor
 
 pushd $PYTHON_PROJECT_PATH >/dev/null 2>&1
 
-write_info "test" "Running unit tests"
+write_info "python_test" "Running unit tests"
 poetry run coverage run --source=. -m unittest discover -s .
 
 # Check if the tests passed
 if [ $? -eq 0 ]; then
-  write_success "test" "Unit tests passed."
+    write_success "python_test" "Unit tests passed."
 else
-  write_error "test" "Some unit tests failed. Please review the errors."
-  exit 1
+    write_error "python_test" "Some unit tests failed. Please review the errors."
+    exit 1
 fi
 
 # Generate coverage report
-write_info "test" "Generating coverage report..."
+write_info "python_test" "Generating coverage report..."
 coverage report -m
 coverage html
 
-write_success "test" "Coverage report generated. Open 'htmlcov/index.html' to view the detailed report."
+write_success "python_test" "Coverage report generated. Open 'htmlcov/index.html' to view the detailed report."
 
-write_success "test" "Done"
+write_success "python_test" "Done"
 exit 0

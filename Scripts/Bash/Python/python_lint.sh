@@ -22,13 +22,13 @@ poetry run pylint .
 
 # Check if pylint completed successfully
 if [ $? -eq 0 ]; then
-  write_success "lint" "Pylint completed without any errors!"
+  write_success "python_lint" "Pylint completed without any errors!"
 else
-  write_warning "lint" "Pylint detected issues. Please review the output for details."
+  write_warning "python_lint" "Pylint detected issues. Please review the output for details."
   exit 1
 fi
 
 popd >/dev/null 2>&1
 
-write_success "lint" "Done"
+write_success "python_lint" "Done"
 exit 0

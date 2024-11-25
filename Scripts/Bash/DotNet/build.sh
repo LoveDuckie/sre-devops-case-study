@@ -27,7 +27,6 @@ while getopts ':p:c:h?' opt; do
             if [[ ! " ${VALID_CONFIGURATIONS[@]} " =~ " ${CONFIGURATION} " ]]; then
                 write_error "package" "\"$CONFIGURATION\" is not a valid configuration."
                 exit 1
-            else
             fi
             
             write_warning "package" "Build Configuration: \"$CONFIGURATION\""
@@ -47,6 +46,17 @@ while getopts ':p:c:h?' opt; do
         ;;
     esac
 done
+
+if [ -z "$PROJECT_PATH" ]; then
+    write_error "restore" "Failed: The project path was not defined."
+    usage
+fi
+
+if [ ! -e $PROJECT_PATH ]; then
+    write_error "restore" "Failed: The project path was not defined."
+    usage
+fi
+
 
 dotnet build "$PROJECT_PATH" -c "$CONFIGURATION" || write_error "build" "Build failed."
 

@@ -128,7 +128,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker buildx build \
-            --tag my-app:${{ github.sha }} \
+            --tag link-extractor:${{ github.sha }} \
             --cache-to=type=inline \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --output type=docker \

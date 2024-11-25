@@ -13,10 +13,10 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 . "$SHARED_EXT_SCRIPTS_PATH/shared_functions.sh"
 write_header
 
-write_info "build" "$REPO_ROOT_PATH"
+write_info "python_build" "$REPO_ROOT_PATH"
 
 if ! is_command_available poetry; then
-    write_error "build" "Poetry is not installed on this system. Unable to continue."
+    write_error "python_build" "Poetry is not installed on this system. Unable to continue."
     exit 1
 fi
 
@@ -26,5 +26,5 @@ pushd $REPO_ROOT_PATH/Solutions/Python/link-extractor >/dev/null 2>&1
 
 popd >/dev/null 2>&1
 
-write_success "build" "Done"
+write_success "python_build" "Done"
 exit 0

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 <<EOF
 
-   LinkExtractor \ Shell Scripts \ Services \ Start
+    LinkExtractor \ Shell Scripts \ Services \ Start
 
-   
+    Start the service specified.
 
 EOF
 CURRENT_SCRIPT_DIRECTORY=${CURRENT_SCRIPT_DIRECTORY:-$(dirname $(realpath ${BASH_SOURCE[0]:-${(%):-%x}}))}
@@ -14,12 +14,15 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 write_header
 
 usage() {
-    write_info "service_start" "./service_start.sh []"
+    write_info "service_start" "./service_start.sh [-p <service path>]"
     exit 1
 }
 
-while getopts ':s:h?' opt; do
-   case $opt in
+while getopts ':s:p:h?' opt; do
+    case $opt in
+        p)
+            DOCKER_COMPOSE_PATH=$OPTARG
+        ;;
         h|?)
             usage
         ;;
@@ -30,7 +33,7 @@ while getopts ':s:h?' opt; do
         *)
             usage
         ;;
-   esac
+    esac
 done
 
 write_success "service_start" "Done"

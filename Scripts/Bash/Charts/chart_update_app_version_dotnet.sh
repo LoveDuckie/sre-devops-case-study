@@ -17,10 +17,9 @@ write_header
 set -e
 
 function usage() {
-    write_info "chart_update_app_version" "./chart_update_app_version.sh"
+    write_info "chart_update_app_version" "./chart_update_app_version.sh [-c <helm chart path>] [-p <csproj filepath>]"
     exit 1
 }
-
 
 while getopts ':p:c:h?' opt; do
     case $opt in
@@ -37,7 +36,7 @@ while getopts ':p:c:h?' opt; do
             usage
         ;;
         :)
-            write_error "chart_update_app_version" "-${OPTARG} requires an argument"
+            write_error "chart_update_app_version" "\"-${OPTARG}\" requires an argument"
             usage
         ;;
         *)

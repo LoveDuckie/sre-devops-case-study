@@ -3,7 +3,7 @@
 
    LinkExtractor \ Shell Scripts \ DotNet \ Restore
 
-   Restore the .NET application as a NuGet package.
+   Restore the .NET application package dependencies.
 
 EOF
 CURRENT_SCRIPT_DIRECTORY=${CURRENT_SCRIPT_DIRECTORY:-$(dirname $(realpath ${BASH_SOURCE[0]:-${(%):-%x}}))}
@@ -14,24 +14,12 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 write_header
 
 function usage() {
-    write_info "test" "./test.sh [-p <project filepath>] [-c <configuration>]"
+    write_info "restore" "./restore.sh [-p <project filepath>]"
     exit 1
 }
 
-VALID_CONFIGURATIONS=("Release" "Debug")
-
-while getopts ':p:c:h?' opt; do
+while getopts ':ph?' opt; do
     case $opt in
-        c)
-            CONFIGURATION=$OPTARG
-            if [[ ! " ${VALID_CONFIGURATIONS[@]} " =~ " ${CONFIGURATION} " ]]; then
-                write_error "restore" "\"$CONFIGURATION\" is not a valid configuration."
-                exit 1
-            else
-            fi
-            
-            write_warning "restore" "Build Configuration: \"$CONFIGURATION\""
-        ;;
         p)
             PROJECT_PATH=$OPTARG
         ;;
@@ -48,7 +36,22 @@ while getopts ':p:c:h?' opt; do
     esac
 done
 
+if [ -z "$PROJECT_PATH" ]; then
+    write_error "restore" "Failed: The project path was not defined."
+    usage
+fi
+
+if [ ! -e $PROJECT_PATH ]; then
+    write_error "restore" "Failed: The project path was not defined."
+    usage
+fi
+
+write_info "restore" "Restoring Packages: \"$PROJECT_PATH\" "
 dotnet restore "$PROJECT_PATH" || error "Failed to restore dependencies."
+if ! write_response "restore" "Restore: \"$PROJECT_PATH\""; then
+    write_error "restore" "Failed: Unable to restore packages"
+    exit 1
+fi
 
 write_success "restore" "Done"
 exit 0

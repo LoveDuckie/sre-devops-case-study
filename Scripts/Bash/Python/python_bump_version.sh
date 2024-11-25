@@ -13,4 +13,7 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 . "$SHARED_EXT_SCRIPTS_PATH/shared_functions.sh"
 write_header
 
-write_success "bump_version" "Done"
+
+
+write_success "python_bump_version" "Done"
+exit 0

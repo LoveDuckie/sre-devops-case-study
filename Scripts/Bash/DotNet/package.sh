@@ -53,6 +53,17 @@ while getopts ':p:c:o:h?' opt; do
     esac
 done
 
+if [ -z "$PROJECT_PATH" ]; then
+    write_error "restore" "Failed: The project path was not defined."
+    usage
+fi
+
+if [ ! -e $PROJECT_PATH ]; then
+    write_error "restore" "Failed: The project path was not defined."
+    usage
+fi
+
+
 write_info "package" "Packaging: \"$PROJECT_PATH\""
 dotnet package "$PROJECT_PATH" -c "$CONFIGURATION" -o "$OUTPUT_DIR" || write_error "package" "Packaging failed."
 if ! write_response "package" "Package: $PROJECT_PATH"; then

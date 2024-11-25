@@ -27,7 +27,6 @@ while getopts ':p:c:h?' opt; do
             if [[ ! " ${VALID_CONFIGURATIONS[@]} " =~ " ${CONFIGURATION} " ]]; then
                 write_error "test" "\"$CONFIGURATION\" is not a valid configuration."
                 exit 1
-            else
             fi
             
             write_warning "test" "Build Configuration: \"$CONFIGURATION\""
@@ -47,6 +46,17 @@ while getopts ':p:c:h?' opt; do
         ;;
     esac
 done
+
+if [ -z "$PROJECT_PATH" ]; then
+    write_error "restore" "Failed: The project path was not defined."
+    usage
+fi
+
+if [ ! -e $PROJECT_PATH ]; then
+    write_error "restore" "Failed: The project path was not defined."
+    usage
+fi
+
 
 write_info "test" "Running Unit Tests: $PROJECT_PATH"
 dotnet test "$PROJECT_PATH" -c "$CONFIGURATION" --no-build || write_error "test" "Tests failed."

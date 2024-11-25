@@ -31,7 +31,6 @@ type -f is_root >/dev/null 2>&1 && unset -f is_root
 type -f is_valid_docker_builder >/dev/null 2>&1 && unset -f is_valid_docker_builder
 type -f create_docker_builder >/dev/null 2>&1 && unset -f create_docker_builder
 
-
 is_root() {
     if [ `whoami` != 'root' ]; then
         return 1
