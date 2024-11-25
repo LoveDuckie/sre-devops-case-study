@@ -16,7 +16,7 @@ write_header
 CHARTS_PATH=$REPO_ROOT_PATH/Charts
 
 function usage() {
-    write_info "chart_package" "./chart_package.sh"
+    write_info "chart_package" "./chart_package.sh [-c <chart name>]"
     exit 1
 }
 
@@ -41,13 +41,12 @@ done
 
 CHART_PATH=$CHARTS_PATH/$CHART_NAME
 
-if [ ! -d $CHARTS_PATH/$CHART_NAME ]; then
+if [ ! -d $CHART_PATH ]; then
     write_error "chart_deploy" "Failed: Unable to find the chart \"$CHART_NAME\" ($CHARTS_PATH)"
     exit 1
 fi
 
-
-
+helm package
 
 write_success "chart_package" "Done"
 exit 0

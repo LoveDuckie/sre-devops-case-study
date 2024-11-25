@@ -60,3 +60,16 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+
+{{- define "link-extractor.labels" -}}
+app.kubernetes.io/name: {{ .Chart.Name | quote }}
+app.kubernetes.io/instance: {{ .Release.Name | quote }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+app.kubernetes.io/managed-by: {{ .Chart.Name | quote }}
+{{- end -}}
+
+{{- define "link-extractor.annotations" -}}
+description: {{ .Values.annotations.description | quote }}
+maintainer: {{ .Values.annotations.maintainer | quote }}
+{{- end -}}

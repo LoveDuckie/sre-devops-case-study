@@ -46,5 +46,7 @@ if [ ! -d $CHART_PATH ]; then
     exit 1
 fi
 
+helm chart validate
+
 write_success "chart_validate" "Done"
 exit 0

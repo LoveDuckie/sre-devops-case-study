@@ -12,8 +12,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 packages = [
-    { include = "link_extractor" },
-    { include = "link_extractor_tests" }
+    { include = "link_extractor/**/*" },
+    { include = "link_extractor_tests/**/*" }
 ]
 [tool.poetry.dependencies]
 python = "^3.11"

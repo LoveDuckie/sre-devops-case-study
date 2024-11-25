@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 <<EOF
 
-   LinkExtractor \ Shell Scripts \ DotNet \ Build
+   LinkExtractor \ Shell Scripts \ DotNet \ Publish
 
-   Build the .NET application for distribution
+   Publish the .NET application as a NuGet package.
 
 EOF
 CURRENT_SCRIPT_DIRECTORY=${CURRENT_SCRIPT_DIRECTORY:-$(dirname $(realpath ${BASH_SOURCE[0]:-${(%):-%x}}))}
@@ -14,13 +14,13 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 write_header
 
 function usage() {
-    write_info "build" "./build.sh [-p <project filepath>] [-c <configuration>]"
+    write_info "package" "./package.sh [-p <project filepath>] [-c <configuration>]"
     exit 1
 }
 
 VALID_CONFIGURATIONS=("Release" "Debug")
 
-while getopts ':p:c:h?' opt; do
+while getopts ':p:c:o:h?' opt; do
     case $opt in
         c)
             CONFIGURATION=$OPTARG
@@ -34,6 +34,11 @@ while getopts ':p:c:h?' opt; do
         ;;
         p)
             PROJECT_PATH=$OPTARG
+            write_warning "package" "Project Path: \"$PROJECT_PATH\""
+        ;;
+        o)
+            OUTPUT_DIR=$OPTARG
+            write_warning "package" "Output Path: \"$OUTPUT_DIR\""
         ;;
         h|?)
             usage
@@ -48,7 +53,12 @@ while getopts ':p:c:h?' opt; do
     esac
 done
 
-dotnet build "$PROJECT_PATH" -c "$CONFIGURATION" || write_error "build" "Build failed."
+write_info "package" "Packaging: \"$PROJECT_PATH\""
+dotnet package "$PROJECT_PATH" -c "$CONFIGURATION" -o "$OUTPUT_DIR" || write_error "package" "Packaging failed."
+if ! write_response "package" "Package: $PROJECT_PATH"; then
+    write_error "package" "Failed: Unable to package the project \"$PROJECT_PATH\""
+    exit 1
+fi
 
-write_success "build" "Done"
+write_success "package" "Done"
 exit 0

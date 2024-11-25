@@ -13,6 +13,41 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 . "$SHARED_EXT_SCRIPTS_PATH/shared_functions.sh"
 write_header
 
+function usage() {
+    write_info "test" "./test.sh [-p <project filepath>] [-c <configuration>]"
+    exit 1
+}
+
+VALID_CONFIGURATIONS=("Release" "Debug")
+
+while getopts ':p:c:h?' opt; do
+    case $opt in
+        c)
+            CONFIGURATION=$OPTARG
+            if [[ ! " ${VALID_CONFIGURATIONS[@]} " =~ " ${CONFIGURATION} " ]]; then
+                write_error "restore" "\"$CONFIGURATION\" is not a valid configuration."
+                exit 1
+            else
+            fi
+            
+            write_warning "restore" "Build Configuration: \"$CONFIGURATION\""
+        ;;
+        p)
+            PROJECT_PATH=$OPTARG
+        ;;
+        h|?)
+            usage
+        ;;
+        :)
+            write_error "restore" "\"-${OPTARG}\" requires an argument"
+            usage
+        ;;
+        *)
+            usage
+        ;;
+    esac
+done
+
 dotnet restore "$PROJECT_PATH" || error "Failed to restore dependencies."
 
 write_success "restore" "Done"

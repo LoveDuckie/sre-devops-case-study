@@ -2,15 +2,18 @@ import unittest
 from unittest.mock import patch, AsyncMock
 
 import aiohttp
-from aiohttp import ClientResponseError
+from aiohttp import ClientError, ClientResponseError
 
-from link_extractor import is_valid_url, fetch_url, extract_links_from_html, gather_links
+from link_extractor.__main__ import is_valid_url, fetch_url, extract_links_from_html, gather_links
 
 
 class TestURLFunctions(unittest.TestCase):
 
     def test_is_valid_url(self):
-        # Test valid URLs
+        """
+
+        :return:
+        """
         valid_urls = [
             "http://example.com",
             "https://example.com",
@@ -32,10 +35,17 @@ class TestURLFunctions(unittest.TestCase):
 
 
 class TestAsyncFunctions(unittest.IsolatedAsyncioTestCase):
+    """
+    Test the retrieval and parsing of HTML content from aiohttp.
+    """
 
     @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
     async def test_fetch_url_success(self, mock_get):
-        # Mock successful response
+        """
+
+        :param mock_get:
+        :return:
+        """
         mock_response = AsyncMock()
         mock_response.status = 200
         mock_response.text = AsyncMock(return_value="Fake HTML Content")
@@ -50,7 +60,11 @@ class TestAsyncFunctions(unittest.IsolatedAsyncioTestCase):
 
     @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
     async def test_fetch_url_error(self, mock_get):
-        # Mock error response
+        """
+
+        :param mock_get:
+        :return:
+        """
         mock_response = AsyncMock()
         mock_response.status = 404
         mock_response.text = AsyncMock(return_value="")
@@ -65,7 +79,11 @@ class TestAsyncFunctions(unittest.IsolatedAsyncioTestCase):
 
     @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
     async def test_fetch_url_exception(self, mock_get):
-        # Mock an exception during fetching
+        """
+
+        :param mock_get:
+        :return:
+        """
         mock_get.side_effect = ClientResponseError(None, None, status=500)
 
         url = "http://example.com"
@@ -76,6 +94,10 @@ class TestAsyncFunctions(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(content, "")
 
     async def test_extract_links_from_html(self):
+        """
+
+        :return:
+        """
         url = "http://example.com"
         html = """
         <html>
@@ -95,7 +117,11 @@ class TestAsyncFunctions(unittest.IsolatedAsyncioTestCase):
 
     @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
     async def test_gather_links(self, mock_get):
-        # Mock multiple responses
+        """
+
+        :param mock_get:
+        :return:
+        """
         mock_response_1 = AsyncMock()
         mock_response_1.status = 200
         mock_response_1.text = AsyncMock(return_value="<a href='http://example.com/page1'>Link</a>")

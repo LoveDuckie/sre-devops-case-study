@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "link-extractor.labels" . | nindent 4 }}
+  annotations:
+    {{- include "link-extractor.annotations" . | nindent 4 }}
+spec:
+  containers:
+    - name: link-extractor
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      args: {{ .Values.args | toJson }}
+      resources:
+        limits:
+          cpu: {{ .Values.resources.limits.cpu }}
+          memory: {{ .Values.resources.limits.memory }}
+        requests:
+          cpu: {{ .Values.resources.requests.cpu }}
+          memory: {{ .Values.resources.requests.memory }}
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.securityContext.runAsGroup }}
+        readOnlyRootFilesystem: {{ .Values.securityContext.readOnlyRootFilesystem }}
+      lifecycle:
+        postStart:
+          exec:
+            command: ["/bin/sh", "-c", "echo Application has completed. Sleeping indefinitely.; sleep infinity"]
+  restartPolicy: Never
