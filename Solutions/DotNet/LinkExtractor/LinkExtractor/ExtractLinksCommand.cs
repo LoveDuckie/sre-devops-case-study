@@ -71,7 +71,7 @@ public sealed class ExtractLinksCommand : AsyncCommand<ExtractLinksCommand.Setti
             return ValidationResult.Success();
         }
     }
-    
+
 
     /// <summary>
     ///     The command to execute.
@@ -102,35 +102,31 @@ public sealed class ExtractLinksCommand : AsyncCommand<ExtractLinksCommand.Setti
         Dictionary<string, List<string>>? links = null;
         // Synchronous
         await AnsiConsole.Progress()
-            .StartAsync(async (ctx) => 
-            {
-                links = await _linkExtractorService.ExtractLinksAsync(settings.Urls, ctx);
+            .StartAsync(async (ctx) => { links = await _linkExtractorService.ExtractLinksAsync(settings.Urls, ctx); });
 
-            });
+        if (links == null || links.Count == 0)
+        {
+            return 0;
+        }
 
         switch (settings.Output)
         {
             case "stdout":
             {
-                if (links != null)
-                    foreach (var domain in links.Keys)
+                foreach (var domain in links.Keys)
+                {
+                    foreach (var link in links[domain])
                     {
-                        foreach (var link in links[domain])
-                        {
-                            AnsiConsole.WriteLine(link);
-                        }
+                        AnsiConsole.WriteLine(link);
                     }
+                }
 
                 break;
             }
             case "json":
             {
-                if (links != null)
-                {
-                    var json = JsonSerializer.Serialize(links, new JsonSerializerOptions { WriteIndented = true });
-                    AnsiConsole.WriteLine(json);
-                }
-
+                var json = JsonSerializer.Serialize(links, new JsonSerializerOptions { WriteIndented = true });
+                AnsiConsole.WriteLine(json);
                 break;
             }
         }
