@@ -50,7 +50,7 @@ jobs:
       # Run Unit Tests
       - name: Run Unit Tests
         run: |
-          dotnet test Solutions/DotNet/LinkExtractor/LinkExtractor.Tests/LinkExtractor.Tests.csproj --configuration $CONFIGURATION --no-build --verbosity normal
+          dotnet test Solutions/DotNet/LinkExtractor/LinkExtractor.Tests/LinkExtractor.Tests.csproj --configuration $CONFIGURATION --verbosity normal
 
       # Package the Project as a NuGet Package
       - name: Pack Project
