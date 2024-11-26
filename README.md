@@ -136,7 +136,3 @@ GitLab CI configurations are available under the `.gitlab-ci` directory.
 #### GitHub Actions
 
 GitHub Actions workflows are defined under `.github/workflows`.
-
----
-
-This refined README is now clearer, well-structured, and concise. Let me know if further adjustments are needed!
