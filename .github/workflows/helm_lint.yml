@@ -1,0 +1,51 @@
+name: Lint, Package, and Upload Helm Charts
+
+on:
+  push:
+    paths:
+      - "Charts/**"
+  pull_request:
+    paths:
+      - "Charts/**"
+
+jobs:
+  lint-package-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Set up Helm
+      - name: Set up Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      # Lint Charts
+      - name: Lint Charts
+        run: |
+          for chart in Charts/*; do
+            if [ -d "$chart" ]; then
+              echo "Linting $chart"
+              helm lint "$chart"
+            fi
+          done
+
+      # Package Charts
+      - name: Package Charts
+        run: |
+          mkdir -p packaged_charts
+          for chart in Charts/*; do
+            if [ -d "$chart" ]; then
+              echo "Packaging $chart"
+              helm package "$chart" --destination ./packaged_charts
+            fi
+          done
+
+      # Upload Packaged Charts as Artifact
+      - name: Upload Packaged Charts
+        uses: actions/upload-artifact@v3
+        with:
+          name: packaged-charts
+          path: ./packaged_charts/

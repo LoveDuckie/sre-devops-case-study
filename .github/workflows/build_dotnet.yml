@@ -1,0 +1,65 @@
+name: Build, Test, and Package .NET NuGet Package
+
+on:
+  push:
+    paths:
+      - "Solutions/DotNet/LinkExtractor/**"
+  pull_request:
+    paths:
+      - "Solutions/DotNet/LinkExtractor/**"
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: "Build Configuration"
+        required: false
+        default: "Release"
+
+env:
+  DEFAULT_CONFIGURATION: Release # Default value for automated triggers
+
+jobs:
+  build-test-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Set up .NET
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0"
+
+      # Set Configuration Variable
+      - name: Determine Build Configuration
+        run: |
+          echo "CONFIGURATION=${{ github.event.inputs.configuration || env.DEFAULT_CONFIGURATION }}" >> $GITHUB_ENV
+
+      # Restore Dependencies
+      - name: Restore Dependencies
+        run: |
+          dotnet restore Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj
+
+      # Build the Project
+      - name: Build Project
+        run: |
+          dotnet build Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj --configuration $CONFIGURATION --no-restore
+
+      # Run Unit Tests
+      - name: Run Unit Tests
+        run: |
+          dotnet test Solutions/DotNet/LinkExtractor/LinkExtractor.Tests/LinkExtractor.Tests.csproj --configuration $CONFIGURATION --no-build --verbosity normal
+
+      # Package the Project as a NuGet Package
+      - name: Pack Project
+        run: |
+          dotnet pack Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj --configuration $CONFIGURATION --no-build --output ./nupkgs
+
+      # Upload the NuGet package as an artifact
+      - name: Upload NuGet Package Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: link-extractor-nuget-package
+          path: ./nupkgs/

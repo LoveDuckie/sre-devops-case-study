@@ -1,0 +1,55 @@
+name: Build and Package Python Project with Poetry
+
+on:
+  push:
+    paths:
+      - "Solutions/Python/link-extractor/**"
+  pull_request:
+    paths:
+      - "Solutions/Python/link-extractor/**"
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11" # Specify the Python version
+
+      # Install Poetry
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # Install Dependencies with Poetry
+      - name: Install Dependencies
+        run: |
+          cd Solutions/Python/link-extractor
+          poetry install
+
+      # Run Tests
+      - name: Run Tests
+        run: |
+          cd Solutions/Python/link-extractor
+          poetry run pytest
+
+      # Build the Package
+      - name: Build Package
+        run: |
+          cd Solutions/Python/link-extractor
+          poetry build
+
+      # Upload the package artifact
+      - name: Upload Package Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: link-extractor-package
+          path: Solutions/Python/link-extractor/dist/

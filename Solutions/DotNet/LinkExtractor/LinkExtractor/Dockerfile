@@ -14,7 +14,7 @@ ARG BUILD_DATE
 LABEL maintainer="Luc Shelton <lucshelton@gmail.com>"
 
 LABEL org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="${BUILD_DATE}" \ 
+    org.label-schema.build-date="${BUILD_DATE}" \
     org.label-schema.name="lucshelton/link-extractor/dotnet" \
     org.label-schema.url="https://www.lucshelton.com" \
     org.label-schema.description="${BUILD_UID}" \
@@ -33,7 +33,7 @@ ARG BUILD_DATE
 LABEL maintainer="Luc Shelton <lucshelton@gmail.com>"
 
 LABEL org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="${BUILD_DATE}" \ 
+    org.label-schema.build-date="${BUILD_DATE}" \
     org.label-schema.name="lucshelton/link-extractor/dotnet" \
     org.label-schema.url="https://www.lucshelton.com" \
     org.label-schema.description="${BUILD_UID}" \
