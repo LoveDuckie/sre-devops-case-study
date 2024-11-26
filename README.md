@@ -1,7 +1,3 @@
-Here’s a refined version of the README, with improved structure, grammar, and clarity:
-
----
-
 <div align="center">
 
 # SRE DevOps Case Study
