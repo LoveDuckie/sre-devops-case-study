@@ -1,4 +1,4 @@
-name: Build, Test, and Package .NET NuGet Package
+name: "Build, Test, and Package: .NET"
 
 on:
   push:

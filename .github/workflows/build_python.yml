@@ -1,4 +1,4 @@
-name: Build and Package Python Project with Poetry
+name: "Build, Test, and Package: Python"
 
 on:
   push:

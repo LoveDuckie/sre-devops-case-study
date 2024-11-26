@@ -1,4 +1,4 @@
-name: Lint, Package, and Upload Helm Charts
+name: "Helm Charts: Lint, Package, and Upload "
 
 on:
   push:
@@ -7,6 +7,8 @@ on:
   pull_request:
     paths:
       - "Charts/**"
+  workflow_dispatch:
+    inputs: {}
 
 jobs:
   lint-package-upload:
