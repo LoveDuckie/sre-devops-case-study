@@ -18,7 +18,7 @@ function usage() {
     exit 1
 }
 
-while getopts ':c:p:h?' opt; do
+while getopts ':c:p:t:h?' opt; do
     case $opt in
         c)
             DOCKER_BUILD_CONTEXT_PATH=$OPTARG
@@ -82,31 +82,6 @@ if ! is_valid_docker_builder "$BUILDER_NAME"; then
     write_info "build_docker" "Creating Builder: \"$BUILDER_NAME\""
     create_docker_builder "$BUILDER_NAME"
 fi
-
-
-#     write_info "build_docker" "Building type: \"$build_type\""
-#     TAG="${TAG_PREFIX}:${build_type}"
-#     TAG_VERSION="${TAG_PREFIX}:${VERSION}-${build_type}"
-
-#     for build_architecture in "${BUILD_ARCHITECTURES[@]}"; do
-#         TAG_ARCH="${TAG}-${build_architecture//\//-}"
-#         write_info "build_docker" "↪ Architecture: \"$build_architecture\""
-#         write_info "build_docker" "↪ Tag (Architecture): \"$TAG_ARCH\""
-
-#         docker buildx build --builder "$BUILDER_NAME" \
-#         --platform "$build_architecture" \
-#         --load \
-#         --tag "$TAG_ARCH" \
-#         --build-arg BUILD_TYPE="$build_type" \
-#         --build-arg VERSION="$BUILD_VERSION" \
-#         -f "$DOCKERFILE_FILEPATH" "$DOCKER_PROJECT_PATH"
-#         # -f "$DOCKERFILE_FILEPATH"
-#         if ! write_response "build_docker" "Build: \"$DOCKERFILE_FILEPATH\""; then
-#             write_error "build_docker" "Failed: Unable to build \"$DOCKERFILE_FILEPATH\""
-#             exit 1
-#         fi
-#     done
-# done
 
 for build_type in ${BUILD_TYPES[@]}; do
     for build_architecture in "${BUILD_ARCHITECTURES[@]}"; do

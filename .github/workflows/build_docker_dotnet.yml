@@ -8,15 +8,11 @@ on:
     paths:
       - "Solutions/DotNet/LinkExtractor/**"
   workflow_dispatch:
-    inputs:
-      configuration:
-        description: "Build Configuration"
-        required: false
-        default: "Release"
+    inputs: {}
 
 jobs:
   build-docker-dotnet:
-    uses: ./.github/workflows/shared/build_docker.yml
+    uses: ./.github/workflows/shared/docker/build_docker.yml
     with:
       dockerfile: ./Solutions/DotNet/LinkExtractor/LinkExtractor/Dockerfile
       context: ./Solutions/DotNet/LinkExtractor

@@ -9,7 +9,7 @@ ARG BUILD_UID
 ARG BUILD_DATE
 
 LABEL org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="${BUILD_DATE}" \ 
+    org.label-schema.build-date="${BUILD_DATE}" \
     org.label-schema.name="lucshelton/link-extractor/python" \
     org.label-schema.url="https://www.lucshelton.com" \
     org.label-schema.description="${BUILD_UID}" \
@@ -17,7 +17,7 @@ LABEL org.label-schema.schema-version="1.0" \
 
 WORKDIR /app
 COPY . /app
-RUN pip install -e .
+RUN pip install .
 
 FROM python:3.11-alpine
 
@@ -26,13 +26,16 @@ ARG BUILD_UID
 ARG BUILD_DATE
 
 LABEL org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date="${BUILD_DATE}" \ 
+    org.label-schema.build-date="${BUILD_DATE}" \
     org.label-schema.name="lucshelton/link-extractor/python" \
     org.label-schema.url="https://www.lucshelton.com" \
     org.label-schema.description="${BUILD_UID}" \
     org.label-schema.version="${BUILD_VERSION}"
 
 WORKDIR /app
+RUN apk add --no-cache bash nano libffi-dev gcc musl-dev
 COPY --from=base /usr/local/lib/python3.11 /usr/local/lib/python3.11
-ENTRYPOINT ["python", "-m", "link-extractor"]
+COPY --from=base /app /app
+# RUN pip install -e .
+ENTRYPOINT ["link-extractor"]
 CMD []

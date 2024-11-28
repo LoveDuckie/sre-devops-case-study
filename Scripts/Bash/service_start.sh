@@ -46,8 +46,12 @@ SERVICE_PROJECT_PATH=$REPO_ROOT_PATH/Services/$SERVICE_NAME
 
 if [ ! -d $SERVICE_PROJECT_PATH ]; then
     write_error "service_start" "Failed: Unable to find the service project path \"$SERVICE_PROJECT_PATH\""
-    exit 1
+    exit 2
 fi
+
+pushd $SERVICE_PROJECT_PATH >/dev/null 2>&1
+docker compose up
+popd >/dev/null 2>&1
 
 write_success "service_start" "Done"
 exit 0

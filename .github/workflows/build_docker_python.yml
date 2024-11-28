@@ -12,7 +12,7 @@ on:
 
 jobs:
   build-docker-python:
-    uses: ./.github/workflows/shared/build_docker.yml
+    uses: ./.github/workflows/shared/docker/build_docker.yml
     with:
       dockerfile: ./Solutions/Python/link-extractor/Dockerfile
       context: ./Solutions/Python/link-extractor

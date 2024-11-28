@@ -63,3 +63,20 @@ jobs:
         with:
           name: link-extractor-nuget-package
           path: ./nupkgs/
+
+      # Authenticate with GitHub Packages
+      - name: Authenticate with GitHub Packages
+        run: |
+          dotnet nuget add source \
+            --username ${{ github.actor }} \
+            --password ${{ secrets.GITHUB_TOKEN }} \
+            --store-password-in-clear-text \
+            --name github \
+            https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+
+      # Push the package to GitHub Packages
+      - name: Push Package to GitHub Packages
+        run: |
+          dotnet nuget push ./nupkgs/*.nupkg \
+            --source github \
+            --api-key ${{ secrets.GITHUB_TOKEN }}
