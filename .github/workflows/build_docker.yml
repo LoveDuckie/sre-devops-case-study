@@ -67,7 +67,9 @@ jobs:
       - name: Build multi-architecture Docker image with cache
         run: |
           # Parse build arguments if provided
-          BUILD_ARGS=""
+          BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          BUILD_UID="$(uuidgen)"
+          BUILD_ARGS="--build-arg BUILD_UID=$BUILD_UID --build-arg BUILD_DATE=$BUILD_DATE"
           if [ -n "${{ inputs.build_args }}" ]; then
             for ARG in $(echo "${{ inputs.build_args }}" | tr ',' '\n'); do
               BUILD_ARGS="$BUILD_ARGS --build-arg $ARG"
