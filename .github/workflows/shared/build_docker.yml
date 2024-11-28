@@ -1,0 +1,88 @@
+name: Reusable Multi-Architecture Docker Build
+
+on:
+  workflow_call:
+    inputs:
+      dockerfile:
+        description: "Path to the Dockerfile"
+        required: true
+        type: string
+      context:
+        description: "Build context directory"
+        required: true
+        type: string
+      image:
+        description: "Image name and tag"
+        required: true
+        type: string
+      cache_image:
+        description: "Cache image reference"
+        required: false
+        type: string
+        default: ""
+      platforms:
+        description: "Comma-separated list of target platforms"
+        required: false
+        type: string
+        default: "linux/amd64,linux/arm64"
+      build_args:
+        description: "Comma-separated list of build arguments (key=value)"
+        required: false
+        type: string
+        default: ""
+    # secrets:
+    #   DOCKER_USERNAME:
+    #     required: true
+    #   DOCKER_PASSWORD:
+    #     required: true
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # # Step 1: Checkout the code
+      # - name: Checkout code
+      #   uses: actions/checkout@v3
+
+      # Step 2: Set up QEMU for multi-platform builds
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      # Step 2: Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+
+      # Step 3: Log in to DockerHub or other registry
+      # - name: Log in to DockerHub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Step 4: Build the Docker image
+      - name: Build multi-architecture Docker image with cache
+        run: |
+          # Parse build arguments
+          BUILD_ARGS=""
+          if [ "${{ inputs.build_args }}" != "" ]; then
+            for ARG in $(echo "${{ inputs.build_args }}" | tr ',' '\n'); do
+              BUILD_ARGS="$BUILD_ARGS --build-arg $ARG"
+            done
+          fi
+
+          # Run the build command
+          docker buildx build \
+            --file ${{ inputs.dockerfile }} \
+            --build-context context=${{ inputs.context }} \
+            --platform ${{ inputs.platforms }} \
+            --cache-to=type=inline \
+            --cache-from=type=registry,ref=${{ inputs.cache_image }} \
+            $BUILD_ARGS \
+            --tag ${{ inputs.image }} \
+
+#            --push

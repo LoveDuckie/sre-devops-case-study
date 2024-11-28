@@ -57,7 +57,6 @@ if [ ! -e $PROJECT_PATH ]; then
     usage
 fi
 
-
 write_info "test" "Running Unit Tests: $PROJECT_PATH"
 dotnet test "$PROJECT_PATH" -c "$CONFIGURATION" --no-build || write_error "test" "Tests failed."
 if ! write_response "test" "Test: $PROJECT_PATH"; then

@@ -7,21 +7,22 @@
 
 EOF
 CURRENT_SCRIPT_DIRECTORY=${CURRENT_SCRIPT_DIRECTORY:-$(dirname $(realpath ${BASH_SOURCE[0]:-${(%):-%x}}))}
-export SHARED_EXT_SCRIPTS_PATH=${SHARED_EXT_SCRIPTS_PATH:-$(realpath $CURRENT_SCRIPT_DIRECTORY/scripts)}
+export SHARED_EXT_SCRIPTS_PATH=${SHARED_EXT_SCRIPTS_PATH:-$(realpath $CURRENT_SCRIPT_DIRECTORY)}
 export CURRENT_SCRIPT_FILENAME=${CURRENT_SCRIPT_FILENAME:-$(basename ${BASH_SOURCE[0]:-${(%):-%x}})}
 export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 . "$SHARED_EXT_SCRIPTS_PATH/shared_functions.sh"
 write_header
 
 usage() {
-    write_info "service_start" "./service_start.sh [-p <service path>]"
+    write_info "service_start" "./service_start.sh [-p <service name>]"
     exit 1
 }
 
 while getopts ':s:p:h?' opt; do
     case $opt in
         p)
-            DOCKER_COMPOSE_PATH=$OPTARG
+            SERVICE_NAME=$OPTARG
+            write_warning "service_start" "Service Name: \"$SERVICE_NAME\""
         ;;
         h|?)
             usage
@@ -35,6 +36,18 @@ while getopts ':s:p:h?' opt; do
         ;;
     esac
 done
+
+if [ -z "$SERVICE_NAME" ]; then
+   write_error "service_start" "The \"docker-compose\" path specified is invalid or null"
+   exit 1
+fi
+
+SERVICE_PROJECT_PATH=$REPO_ROOT_PATH/Services/$SERVICE_NAME
+
+if [ ! -d $SERVICE_PROJECT_PATH ]; then
+    write_error "service_start" "Failed: Unable to find the service project path \"$SERVICE_PROJECT_PATH\""
+    exit 1
+fi
 
 write_success "service_start" "Done"
 exit 0

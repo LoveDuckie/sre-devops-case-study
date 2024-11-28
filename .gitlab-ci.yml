@@ -8,8 +8,8 @@ stages:
 
 variables:
   DOCKER_IMAGE: my-app
-  CSPROJ_FILE: ./MyApp/MyApp.csproj
-  PACKAGE_OUTPUT: ./MyApp/bin/Release/net6.0/
+  CSPROJ_FILE: ./Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj
+  PACKAGE_OUTPUT: ./Solutions/DotNet/LinkExtractor/LinkExtractor/bin/Release/net8.0/
   BUILDKIT_INLINE_CACHE: 1
 
 # Stage 1: Build .NET Application

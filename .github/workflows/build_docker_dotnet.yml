@@ -1,4 +1,4 @@
-name: "Build Dcker: .NET"
+name: "Build Docker: .NET"
 
 on:
   push:
@@ -15,7 +15,14 @@ on:
         default: "Release"
 
 jobs:
-  build-docker:
-    runs-on: ubuntu-latest
-    steps:
-      - run: ""
+  build-docker-dotnet:
+    uses: ./.github/workflows/shared/build_docker.yml
+    with:
+      dockerfile: ./Solutions/DotNet/LinkExtractor/LinkExtractor/Dockerfile
+      context: ./Solutions/DotNet/LinkExtractor
+      image: link-extractor-dotnet:latest
+      cache_image: link-extractor-dotnet:cache
+      platforms: ${{ github.event.inputs.platforms }}
+    # secrets:
+    #   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+    #   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

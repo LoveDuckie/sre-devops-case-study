@@ -1,4 +1,4 @@
-name: "Helm Charts: Lint, Package, and Upload "
+name: "Helm Charts: Lint, Package, and Upload"
 
 on:
   push:

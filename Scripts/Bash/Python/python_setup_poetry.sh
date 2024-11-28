@@ -13,6 +13,67 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 . "$SHARED_EXT_SCRIPTS_PATH/shared_functions.sh"
 write_header
 
+set -e
+set -o pipefail
+
+write_info "python_setup_poetry" "Starting Poetry installation with pyenv Python..."
+
+# Variables
+POETRY_INSTALL_URL="https://install.python-poetry.org"
+POETRY_BIN_DIR="$HOME/.local/bin"
+PROFILE_FILES=("$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile")
+
+# Check if pyenv is installed
+if ! command -v pyenv &>/dev/null; then
+    write_info "python_setup_poetry" "Error: pyenv is not installed. Please install pyenv and re-run this script."
+    exit 1
+fi
+
+# Get the currently active Python version from pyenv
+PYENV_PYTHON=$(pyenv which python3 || pyenv which python)
+
+if [[ -z "$PYENV_PYTHON" ]]; then
+    write_info "python_setup_poetry" "Error: No Python version is active in pyenv. Activate a Python version and re-run this script."
+    exit 1
+fi
+
+write_info "python_setup_poetry" "Using Python from pyenv: $PYENV_PYTHON"
+
+# Download and install Poetry
+if command -v curl &>/dev/null; then
+    write_info "python_setup_poetry" "Using curl to install Poetry..."
+    curl -sSL $POETRY_INSTALL_URL | $PYENV_PYTHON -
+    elif command -v wget &>/dev/null; then
+    write_info "python_setup_poetry" "Using wget to install Poetry..."
+    wget -qO- $POETRY_INSTALL_URL | $PYENV_PYTHON -
+else
+    write_info "python_setup_poetry" "Error: Neither curl nor wget is available. Please install one of them and re-run this script."
+    exit 1
+fi
+
+# Ensure the installation directory is added to PATH
+if [[ ":$PATH:" != *":$POETRY_BIN_DIR:"* ]]; then
+    write_info "python_setup_poetry" "Adding Poetry's bin directory to PATH..."
+    for profile in "${PROFILE_FILES[@]}"; do
+        if [[ -f "$profile" ]]; then
+            write_info "python_setup_poetry" "export PATH=\"\$PATH:$POETRY_BIN_DIR\"" >> "$profile"
+            write_info "python_setup_poetry" "Updated $profile to include Poetry's bin directory."
+        fi
+    done
+    write_info "python_setup_poetry" "Please restart your terminal or run 'source ~/.bashrc' (or equivalent) to use Poetry."
+fi
+
+# Verify installation
+if command -v poetry &>/dev/null; then
+    write_info "python_setup_poetry" "Poetry installed successfully!"
+    poetry --version
+else
+    write_info "python_setup_poetry" "Poetry installation failed. Please check the output for errors."
+    exit 1
+fi
+
+
+poetry self add poetry-bumpversion
 
 
 write_success "setup_poetry" "Done"

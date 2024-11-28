@@ -1,0 +1,24 @@
+name: "Build Docker: Python"
+
+on:
+  push:
+    paths:
+      - "Solutions/Python/link-extractor/**"
+  pull_request:
+    paths:
+      - "Solutions/Python/link-extractor/**"
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  build-docker-python:
+    uses: ./.github/workflows/shared/build_docker.yml
+    with:
+      dockerfile: ./Solutions/Python/link-extractor/Dockerfile
+      context: ./Solutions/Python/link-extractor
+      image: link-extractor-python:latest
+      cache_image: link-extractor-python:cache
+      platforms: ${{ github.event.inputs.platforms }}
+    # secrets:
+    #   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+    #   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
