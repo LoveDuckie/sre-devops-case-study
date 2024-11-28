@@ -64,28 +64,40 @@ jobs:
       #     username: ${{ secrets.DOCKER_USERNAME }}
       #     password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 4: Build the Docker image
       - name: Build multi-architecture Docker image with cache
         run: |
-          # Parse build arguments
+          # Parse build arguments if provided
           BUILD_ARGS=""
-          if [ "${{ inputs.build_args }}" != "" ]; then
+          if [ -n "${{ inputs.build_args }}" ]; then
             for ARG in $(echo "${{ inputs.build_args }}" | tr ',' '\n'); do
               BUILD_ARGS="$BUILD_ARGS --build-arg $ARG"
             done
           fi
 
+          # Ensure platforms are properly passed
+          PLATFORMS=${{ inputs.platforms }}
+          if [ -z "$PLATFORMS" ]; then
+            echo "No platforms provided. Using default: linux/amd64"
+            PLATFORMS="linux/amd64"
+          fi
+
+          # Ensure context is not empty
+          CONTEXT=${{ inputs.context }}
+          if [ -z "$CONTEXT" ]; then
+            echo "Build context is required but not provided."
+            exit 1
+          fi
+
           # Run the build command
           docker buildx build \
             --file ${{ inputs.dockerfile }} \
-            --build-context context=${{ inputs.context }} \
-            --platform ${{ inputs.platforms }} \
+            --build-context context=$CONTEXT \
+            --platform $PLATFORMS \
             --cache-to=type=inline \
             --cache-from=type=registry,ref=${{ inputs.cache_image }} \
             $BUILD_ARGS \
             --tag ${{ inputs.image }} \
-
-      #            --push
+            --load
 
       - name: Security scan with Trivy
         uses: aquasecurity/trivy-action@master
