@@ -93,13 +93,13 @@ jobs:
           # Run the build command
           docker buildx build \
             --file ${{ inputs.dockerfile }} \
-            --build-context context=$CONTEXT \
             --platform $PLATFORMS \
             --cache-to=type=inline \
             --cache-from=type=registry,ref=${{ inputs.cache_image }} \
             $BUILD_ARGS \
             --tag ${{ inputs.image }} \
-            --load
+            --load \
+            $CONTEXT
 
       - name: Security scan with Trivy
         uses: aquasecurity/trivy-action@master
