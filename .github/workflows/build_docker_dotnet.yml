@@ -1,0 +1,21 @@
+name: "Build Dcker: .NET"
+
+on:
+  push:
+    paths:
+      - "Solutions/DotNet/LinkExtractor/**"
+  pull_request:
+    paths:
+      - "Solutions/DotNet/LinkExtractor/**"
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: "Build Configuration"
+        required: false
+        default: "Release"
+
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - run: ""

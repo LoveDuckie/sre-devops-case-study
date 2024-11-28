@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 <<EOF
 
-   LinkExtractor \ Shell Scripts \ Python \ Build
+   LinkExtractor \ Shell Scripts \ Python \ Setup
 
-   Build and package the Python application
+   Scripts for setting up Python based dependencies
 
 EOF
 CURRENT_SCRIPT_DIRECTORY=${CURRENT_SCRIPT_DIRECTORY:-$(dirname $(realpath ${BASH_SOURCE[0]:-${(%):-%x}}))}
@@ -13,18 +13,7 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 . "$SHARED_EXT_SCRIPTS_PATH/shared_functions.sh"
 write_header
 
-write_info "python_build" "$REPO_ROOT_PATH"
 
-if ! is_command_available poetry; then
-    write_error "python_build" "Poetry is not installed on this system. Unable to continue."
-    exit 1
-fi
 
-pushd $REPO_ROOT_PATH/Solutions/Python/link-extractor >/dev/null 2>&1
-
-poetry build
-
-popd >/dev/null 2>&1
-
-write_success "python_build" "Done"
+write_success "python_setup" "Done"
 exit 0
