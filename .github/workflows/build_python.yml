@@ -36,10 +36,14 @@ jobs:
           poetry install
 
       # Run Tests
+      # - name: Run Tests
+      #   run: |
+      #     cd Solutions/Python/link-extractor
+      #     poetry run pytest
       - name: Run Tests
         run: |
           cd Solutions/Python/link-extractor
-          poetry run pytest
+          poetry run coverage run --source=. -m unittest discover -s .
 
       # Build the Package
       - name: Build Package
