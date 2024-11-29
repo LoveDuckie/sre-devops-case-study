@@ -32,39 +32,32 @@ jobs:
         with:
           dotnet-version: "8.0"
 
-      # Set Configuration Variable
       - name: Determine Build Configuration
         run: |
           echo "CONFIGURATION=${{ github.event.inputs.configuration || env.DEFAULT_CONFIGURATION }}" >> $GITHUB_ENV
 
-      # Restore Dependencies
       - name: Restore Dependencies
         run: |
           dotnet restore Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj
 
-      # Build the Project
       - name: Build Project
         run: |
           dotnet build Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj --configuration $CONFIGURATION --no-restore
 
-      # Run Unit Tests
       - name: Run Unit Tests
         run: |
           dotnet test Solutions/DotNet/LinkExtractor/LinkExtractor.Tests/LinkExtractor.Tests.csproj --configuration $CONFIGURATION --verbosity normal
 
-      # Package the Project as a NuGet Package
       - name: Pack Project
         run: |
           dotnet pack Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj --configuration $CONFIGURATION --no-build --output ./nupkgs
 
-      # Upload the NuGet package as an artifact
       - name: Upload NuGet Package Artifact
         uses: actions/upload-artifact@v3
         with:
           name: link-extractor-nuget-package
           path: ./nupkgs/
 
-      # Authenticate with GitHub Packages
       - name: Authenticate with GitHub Packages
         run: |
           dotnet nuget add source \
@@ -74,7 +67,6 @@ jobs:
             --name github \
             https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
 
-      # Push the package to GitHub Packages
       - name: Push Package to GitHub Packages
         run: |
           dotnet nuget push ./nupkgs/*.nupkg \

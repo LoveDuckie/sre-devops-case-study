@@ -57,3 +57,7 @@ pylint = "^3.2.5"
 
 [tool.poetry.group.test.dependencies]
 coverage = "^7.6.0"
+
+[tool.poetry_bumpversion.file."link_extractor/__init__.py"]
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
