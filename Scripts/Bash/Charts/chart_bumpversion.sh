@@ -68,7 +68,8 @@ bump_version() {
 BUMP_TYPE=${1:-patch} # Default to patch if not provided
 
 # Detect modified charts in the parent directory using git
-write_info "chart_bumpversion" "Detecting modified charts in $HELM_CHARTS_PATH..."
+write_info "chart_bumpversion" "Helm Charts Path: \"$HELM_CHARTS_PATH\""
+write_info "chart_bumpversion" "Detecting modified charts in \"$HELM_CHARTS_PATH\"..."
 
 MODIFIED_CHARTS=$(git diff --name-only HEAD~1 HEAD "$HELM_CHARTS_PATH" | grep "Chart.yaml" | xargs -n1 dirname | sort -u)
 
@@ -78,9 +79,9 @@ if [ -z "$MODIFIED_CHARTS" ]; then
 fi
 
 for chart in $MODIFIED_CHARTS; do
-  echo "Processing chart in $chart..."
+  write_info "chart_bumpversion" "Processing chart in $chart..."
 
-  chart_file="$chart/Chart.yaml"
+  chart_file="$REPO_ROOT_PATH/$chart/Chart.yaml"
 
   if [ ! -f "$chart_file" ]; then
     write_error "chart_bumpversion" "Error: $chart_file does not exist."
