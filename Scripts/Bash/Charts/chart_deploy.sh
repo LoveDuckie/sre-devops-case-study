@@ -24,11 +24,11 @@ while getopts ':c:n:h?' opt; do
     case $opt in
         c)
             export CHART_NAME=$OPTARG
-            write_warning "chart_deploy" "Chart: \"$CHART_NAME\""
+            write_warning "chart_deploy" "Helm Chart: \"$CHART_NAME\""
         ;;
         n)
             export CHART_NAMESPACE=$OPTARG
-            write_warning "chart_validate" "Chart Namespace: \"$CHART_NAMESPACE\""
+            write_warning "chart_deploy" "Helm Chart Namespace: \"$CHART_NAMESPACE\""
         ;;
         h|?)
             usage

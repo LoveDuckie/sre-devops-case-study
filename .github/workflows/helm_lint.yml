@@ -3,10 +3,10 @@ name: "Helm Charts: Lint, Package, and Upload"
 on:
   push:
     paths:
-      - "Charts/**"
+      - "Helm/Charts/**"
   pull_request:
     paths:
-      - "Charts/**"
+      - "Helm/Charts/**"
   workflow_dispatch:
     inputs: {}
 
@@ -27,7 +27,7 @@ jobs:
       # Lint Charts
       - name: Lint Charts
         run: |
-          for chart in Charts/*; do
+          for chart in Helm/Charts/*; do
             if [ -d "$chart" ]; then
               echo "Linting $chart"
               helm lint "$chart"
@@ -38,7 +38,7 @@ jobs:
       - name: Package Charts
         run: |
           mkdir -p packaged_charts
-          for chart in Charts/*; do
+          for chart in Helm/Charts/*; do
             if [ -d "$chart" ]; then
               echo "Packaging $chart"
               helm package "$chart" --destination ./packaged_charts

@@ -36,6 +36,6 @@ WORKDIR /app
 RUN apk add --no-cache bash nano libffi-dev gcc musl-dev
 COPY --from=base /usr/local/lib/python3.11 /usr/local/lib/python3.11
 COPY --from=base /app /app
-# RUN pip install -e .
+RUN pip install .
 ENTRYPOINT ["link-extractor"]
 CMD []

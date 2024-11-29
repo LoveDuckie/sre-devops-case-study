@@ -13,24 +13,22 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 . "$SHARED_EXT_SCRIPTS_PATH/shared_functions.sh"
 write_header
 
-CHARTS_PATH=$REPO_ROOT_PATH/Charts
-
 function usage() {
-    write_info "chart_validate" "./chart_validate.sh"
+    write_info "chart_lint" "./chart_lint.sh"
     exit 1
 }
 
 while getopts ':c:h?' opt; do
     case $opt in
         c)
-            export CHART_NAME=$OPTARG
-            write_warning "chart_validate" "Chart: \"$CHART_NAME\""
+            export HELM_CHART_NAME=$OPTARG
+            write_warning "chart_lint" "Helm Chart: \"$HELM_CHART_NAME\""
         ;;
         h|?)
             usage
         ;;
         :)
-            write_error "chart_validate" "-${OPTARG} requires an argument"
+            write_error "chart_lint" "\"-${OPTARG}\" requires an argument"
             usage
         ;;
         *)
@@ -39,14 +37,15 @@ while getopts ':c:h?' opt; do
     esac
 done
 
-CHART_PATH=$CHARTS_PATH/$CHART_NAME
+HELM_CHART_PATH=$HELM_CHARTS_PATH/$HELM_CHART_NAME
 
-if [ ! -d $CHART_PATH ]; then
-    write_error "chart_validate" "Failed: Unable to find the chart \"$CHART_NAME\" ($CHARTS_PATH)"
+if [ ! -d $HELM_CHART_PATH ]; then
+    write_error "chart_lint" "Failed: Unable to find the chart \"$HELM_CHART_NAME\" ($HELM_CHARTS_PATH)"
     exit 1
 fi
 
-helm chart validate
+write_info "chart_lint" "(Helm) Linting: $HELM_CHART_PATH"
+helm lint $HELM_CHART_PATH
 
-write_success "chart_validate" "Done"
+write_success "chart_lint" "Done"
 exit 0

@@ -1,5 +1,0 @@
-repositories:
-  - name: aqua
-    url: https://aquasecurity.github.io/helm-charts/
-  - name: bitnami
-    url: https://charts.bitnami.com/bitnami

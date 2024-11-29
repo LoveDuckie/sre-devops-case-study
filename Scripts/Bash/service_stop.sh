@@ -14,7 +14,7 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 write_header
 
 usage() {
-    write_info "service_start" "./service_start.sh [-p <service name>]"
+    write_info "service_stop" "./service_stop.sh [-p <service name>]"
     exit 1
 }
 
@@ -22,13 +22,13 @@ while getopts ':s:h?' opt; do
     case $opt in
         s)
             SERVICE_NAME=$OPTARG
-            write_warning "service_start" "Service Name: \"$SERVICE_NAME\""
+            write_warning "service_stop" "Service Name: \"$SERVICE_NAME\""
         ;;
         h|?)
             usage
         ;;
         :)
-            write_error "service_start" "\"-${OPTARG}\" requires an argument"
+            write_error "service_stop" "\"-${OPTARG}\" requires an argument"
             usage
         ;;
         *)
@@ -38,10 +38,10 @@ while getopts ':s:h?' opt; do
 done
 
 if [ -z "$SERVICE_NAME" ]; then
-   write_error "service_start" "The service name was not specified."
-   write_error "service_start" "Avaialble Services:"
+   write_error "service_stop" "The service name was not specified."
+   write_error "service_stop" "Avaialble Services:"
    for service_path in $REPO_ROOT_PATH/Services/*; do
-    write_info "service_start" "- $(basename $service_path)"
+    write_info "service_stop" "- $(basename $service_path)"
    done
    exit 1
 fi
@@ -49,7 +49,7 @@ fi
 SERVICE_PROJECT_PATH=$REPO_ROOT_PATH/Services/$SERVICE_NAME
 
 if [ ! -d $SERVICE_PROJECT_PATH ]; then
-    write_error "service_start" "Failed: Unable to find the service project path \"$SERVICE_PROJECT_PATH\""
+    write_error "service_stop" "Failed: Unable to find the service project path \"$SERVICE_PROJECT_PATH\""
     exit 2
 fi
 
@@ -57,5 +57,5 @@ pushd $SERVICE_PROJECT_PATH >/dev/null 2>&1
 docker compose up
 popd >/dev/null 2>&1
 
-write_success "service_start" "Done"
+write_success "service_stop" "Done"
 exit 0

@@ -1,0 +1,26 @@
+repositories:
+  - name: aqua
+    url: https://aquasecurity.github.io/helm-charts/
+  - name: falco
+    url: https://falcosecurity.github.io/charts
+
+releases:
+  - name: link-extractor-app-pod
+    namespace: link-extractor
+    chart: ./../../../Helm/Charts/link-extractor-app-pod
+    values:
+      - ./../../../Helm/Values/Python/values.yaml
+
+  # - name: falco
+  #   namespace: security
+  #   chart: falco/falco
+  #   version: 1.5.0 # Optional: Specify a specific version of the chart
+  #   values:
+  #     - ./path/to/falco-values.yaml # Replace with your custom values file
+
+  # - name: trivy
+  #   namespace: security
+  #   chart: aqua/trivy
+  #   version: 2.0.0 # Replace with the desired version of Trivy
+  #   values:
+  #     - ./path/to/trivy-values.yaml # Replace with your custom values file for Trivy

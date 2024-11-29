@@ -60,7 +60,6 @@ if [ ! -d "$DOCKER_BUILD_CONTEXT_PATH"  ]; then
     exit 2
 fi
 
-
 if [ -z "$DOCKERFILE_FILEPATH" ]; then
     write_error "build_docker" "The Dockerfile was not defined."
     exit 1
@@ -78,10 +77,16 @@ BUILD_TYPES=("development" "production")
 TAG_PREFIX=link-extractor
 BUILDER_NAME=$TAG_PREFIX-builder
 
+BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+BUILD_UID="$(uuidgen)"
+
 if ! is_valid_docker_builder "$BUILDER_NAME"; then
     write_info "build_docker" "Creating Builder: \"$BUILDER_NAME\""
     create_docker_builder "$BUILDER_NAME"
 fi
+
+write_info "build_docker" "Build Date: $BUILD_DATE"
+write_info "build_docker" "Build UID: $BUILD_UID"
 
 for build_type in ${BUILD_TYPES[@]}; do
     for build_architecture in "${BUILD_ARCHITECTURES[@]}"; do
@@ -94,10 +99,10 @@ for build_type in ${BUILD_TYPES[@]}; do
         --load \
         --tag "$TAG_ARCH" \
         --build-arg BUILD_TYPE="$build_type" \
-        --build-arg VERSION="$BUILD_VERSION" \
+        --build-arg BUILD_DATE="$BUILD_DATE" \
+        --build-arg BUILD_UID="$BUILD_UID" \
         --file "$DOCKERFILE_FILEPATH" \
         "$DOCKER_BUILD_CONTEXT_PATH"
-        # -f "$DOCKERFILE_FILEPATH"
         if ! write_response "build_docker" "Build: \"$DOCKERFILE_FILEPATH\""; then
             write_error "build_docker" "Failed: Unable to build \"$DOCKERFILE_FILEPATH\""
             exit 1

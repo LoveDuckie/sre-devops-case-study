@@ -1,12 +1,16 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Values.fullnameOverride | default .Release.Name }}
   labels:
     {{- include "link-extractor.labels" . | nindent 4 }}
   annotations:
     {{- include "link-extractor.annotations" . | nindent 4 }}
 spec:
+  imagePullSecrets:
+    {{- if .Values.imagePullSecrets }}
+    {{- toYaml .Values.imagePullSecrets | nindent 2 }}
+    {{- end }}
   containers:
     - name: link-extractor
       image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -26,5 +30,21 @@ spec:
       lifecycle:
         postStart:
           exec:
-            command: ["/bin/sh", "-c", "echo Application has completed. Sleeping indefinitely.; sleep infinity"]
+            command: {{ .Values.args | toJson }}
+  {{- if .Values.podSecurityContext }}
+  securityContext:
+    {{- toYaml .Values.podSecurityContext | nindent 2 }}
+  {{- end }}
+  {{- if .Values.nodeSelector }}
+  nodeSelector:
+    {{- toYaml .Values.nodeSelector | nindent 2 }}
+  {{- end }}
+  {{- if .Values.tolerations }}
+  tolerations:
+    {{- toYaml .Values.tolerations | nindent 2 }}
+  {{- end }}
+  {{- if .Values.affinity }}
+  affinity:
+    {{- toYaml .Values.affinity | nindent 2 }}
+  {{- end }}
   restartPolicy: Never
