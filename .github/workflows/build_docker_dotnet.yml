@@ -26,7 +26,7 @@ jobs:
     with:
       dockerfile: ./Solutions/DotNet/LinkExtractor/LinkExtractor/Dockerfile
       context: ./Solutions/DotNet/LinkExtractor
-      image: link-extractor-dotnet:latest
+      image: dotnet
       cache_image: link-extractor-dotnet:cache
       platforms: ${{ github.event.inputs.platforms }}
       build_args: ${{ github.event.inputs.build_args }}

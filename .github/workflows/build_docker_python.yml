@@ -26,7 +26,7 @@ jobs:
     with:
       dockerfile: ./Solutions/Python/link-extractor/Dockerfile
       context: ./Solutions/Python/link-extractor
-      image: link-extractor-python:latest
+      image: python
       cache_image: link-extractor-python:cache
       platforms: ${{ github.event.inputs.platforms }}
       build_args: ${{ github.event.inputs.build_args }}

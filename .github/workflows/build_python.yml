@@ -7,6 +7,13 @@ on:
   pull_request:
     paths:
       - "Solutions/Python/link-extractor/**"
+  workflow_dispatch:
+    inputs:
+      bump_version:
+        description: "Bump version (manual trigger)"
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build-and-package:
@@ -57,3 +64,36 @@ jobs:
         with:
           name: link-extractor-package
           path: Solutions/Python/link-extractor/dist/
+
+  bump-version:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.bump_version == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      # Install Poetry
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # Install Dependencies with Poetry
+      - name: Install Dependencies
+        run: |
+          cd Solutions/Python/link-extractor
+          poetry install
+
+      # Bump Version
+      - name: Bump Version
+        run: |
+          cd Solutions/Python/link-extractor
+          poetry version patch
