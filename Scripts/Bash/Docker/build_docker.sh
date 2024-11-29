@@ -13,7 +13,7 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 . "$SHARED_EXT_SCRIPTS_PATH/shared_functions.sh"
 write_header
 
-set -euo pipefail
+# set -euo pipefail
 
 function usage() {
     write_info "build_docker" "build_docker.sh [-p <dockerfile path>] [-c <docker build context path>]"
@@ -49,7 +49,7 @@ done
 
 TAG_SUFFIXES=( "dotnet" "python" )
 if [[ ! " ${TAG_SUFFIXES[@]} " =~ " ${TAG_SUFFIX} " ]]; then
-  write_error "build_docker" "Value '${TAG_SUFFIX}' is not a valid suffix."
+  write_error "build_docker" "Value \"${TAG_SUFFIX}\" is not a valid suffix."
 fi
 
 if [ -z "$TAG_SUFFIX" ]; then
