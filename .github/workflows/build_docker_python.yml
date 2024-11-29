@@ -30,6 +30,6 @@ jobs:
       cache_image: link-extractor-python:cache
       platforms: ${{ github.event.inputs.platforms }}
       build_args: ${{ github.event.inputs.build_args }}
-    # secrets:
-    #   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-    #   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
