@@ -1,26 +1,21 @@
-# Pull secrets for private repositories
 imagePullSecrets: []
 
-# Chart name and full name overrides
 nameOverride: ""
 fullnameOverride: ""
 
-# Pod annotations and labels
 podAnnotations: {}
 podLabels: {}
 
-# Node scheduling
 nodeSelector: {}
 tolerations: []
 affinity: {}
 
-# Replica count for the Pod
 replicaCount: 1
 
 # Image configuration
 image:
   repository: lucshelton/link-extractor
-  tag: "python-latest"
+  tag: "python-latest-linux-amd64"
   pullPolicy: IfNotPresent
 
 # Pod-specific labels

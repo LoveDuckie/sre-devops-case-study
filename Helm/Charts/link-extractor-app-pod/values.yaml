@@ -35,8 +35,8 @@ replicaCount: 1
 # Image configuration
 image:
   repository: lucshelton/link-extractor
-  tag: "latest"
-  pullPolicy: IfNotPresent
+  tag: latest
+  pullPolicy: Never
 
 # Pod-specific labels
 labels:

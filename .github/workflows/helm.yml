@@ -1,0 +1,11 @@
+name: "Helm Charts: Lint, Bump Version"
+
+on:
+  push:
+    paths:
+      - "Helm/Charts/**"
+  pull_request:
+    paths:
+      - "Helm/Charts/**"
+  workflow_dispatch:
+    inputs: {}

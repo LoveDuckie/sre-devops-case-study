@@ -20,33 +20,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11" # Specify the Python version
+          python-version: "3.11"
 
-      # Install Poetry
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # Install Dependencies with Poetry
       - name: Install Dependencies
         run: |
           cd Solutions/Python/link-extractor
           poetry install
 
-      # Run Tests
-      # - name: Run Tests
-      #   run: |
-      #     cd Solutions/Python/link-extractor
-      #     poetry run pytest
       - name: Run Tests
         run: |
           cd Solutions/Python/link-extractor
@@ -70,29 +61,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      # Install Poetry
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # Install Dependencies with Poetry
       - name: Install Dependencies
         run: |
           cd Solutions/Python/link-extractor
           poetry install
 
-      # Bump Version
       - name: Bump Version
         run: |
           cd Solutions/Python/link-extractor

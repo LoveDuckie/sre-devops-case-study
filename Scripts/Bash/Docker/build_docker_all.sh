@@ -80,6 +80,8 @@ fi
 write_info "build_docker" "Docker Build Context Path: $DOCKER_BUILD_CONTEXT_PATH"
 
 BUILD_ARCHITECTURES=("linux/amd64" "linux/arm64")
+
+BUILD_ARCHITECTURES_COMBINED=$(IFS=,; echo "${BUILD_ARCHITECTURES[*]}")
 BUILD_TYPES=("development" "production")
 
 TAG_PREFIX=lucshelton/link-extractor
