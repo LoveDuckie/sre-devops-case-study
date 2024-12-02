@@ -32,7 +32,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Poetry
-        uses: ./.github/actions/install_poetry
+        uses: ./.github/actions/install-poetry
 
       - name: Install Dependencies
         run: |
@@ -52,7 +52,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Poetry
-        uses: ./.github/actions/install_poetry
+        uses: ./.github/actions/install-poetry
 
       - name: Lint
         run: ./Scripts/Bash/Python/python_lint.sh
@@ -70,7 +70,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Poetry
-        uses: ./.github/actions/install_poetry
+        uses: ./.github/actions/install-poetry
 
       - name: Run Tests
         run: ./Scripts/Bash/Python/python_test.sh
@@ -91,7 +91,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Poetry
-        uses: ./.github/actions/install_poetry
+        uses: ./.github/actions/install-poetry
 
       - name: Conditional Version Bump and Commit
         run: |
@@ -122,7 +122,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Poetry
-        uses: ./.github/actions/install_poetry
+        uses: ./.github/actions/install-poetry
 
       - name: Build Package
         run: ./Scripts/Bash/Python/python_build.sh
@@ -146,7 +146,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Poetry
-        uses: ./.github/actions/install_poetry
+        uses: ./.github/actions/install-poetry
 
       - name: Determine Version
         id: version
