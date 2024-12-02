@@ -15,18 +15,17 @@ write_header
 
 usage() {
     write_info "python_run" "./python_run.sh -p <project_path> [app_args...]"
+    exit 1
 }
 
-# Initialize variables
 TARGET_PROJECT_PATH=""
 APP_ARGS=()
 
-# Parse options
 while getopts ':p:h?' opt; do
-   case $opt in
+    case $opt in
         p)
             TARGET_PROJECT_PATH=$OPTARG
-            write_info "python_run" "Python Project Path: $TARGET_PROJECT_PATH"
+            write_info "python_run" "Python Project Path: \"$TARGET_PROJECT_PATH\""
         ;;
         h|?)
             usage
@@ -41,7 +40,7 @@ while getopts ':p:h?' opt; do
             usage
             exit 1
         ;;
-   esac
+    esac
 done
 
 # Shift positional parameters to get trailing arguments
@@ -76,3 +75,4 @@ rm -rf "$CURRENT_SCRIPT_DIRECTORY/venv"
 popd || exit 1
 
 write_success "python_run" "Done"
+exit 0

@@ -126,8 +126,8 @@ write_response() {
             write_error "error" "$3"
         fi
         return 1
-    fi    
-
+    fi
+    
     write_success "success" "$2"
     return 0
 }
@@ -214,28 +214,28 @@ is_valid_docker_context() {
 
 is_valid_docker_builder() {
     export DOCKER_BUILDKIT=1
-
+    
     if [ -z "$1" ]; then
         write_error "shared_functions" "The name of the builder was not defined."
         return 1
     fi
-
+    
     if ! docker buildx inspect "$1" > /dev/null 2>&1; then
         write_error "shared_functions" "The specified builder '$1' does not exist or is not accessible."
         return 1
     fi
-
+    
     return 0
 }
 
 create_docker_builder() {
     export DOCKER_BUILDKIT=1
-
+    
     if [ -z "$1" ]; then
-       write_error "shared_functions" "The name of the builder was not defined."
-       return 1
+        write_error "shared_functions" "The name of the builder was not defined."
+        return 1
     fi
-
+    
     # Check if the builder already exists
     if is_valid_docker_builder "$1"; then
         # write_info "shared_functions" "Docker builder '$1' already exists. Skipping creation."
@@ -243,15 +243,29 @@ create_docker_builder() {
         write_warning "shared_functions" "Removing: \"$1\""
         docker buildx rm "$1"
     fi
-
+    
     # Attempt to create the builder if it doesn't exist
     if ! docker buildx create --name "$1" --use; then
         write_error "shared_functions" "Failed to create Docker builder '$1'."
         return 1
     fi
-
+    
     write_info "shared_functions" "Docker builder '$1' created successfully."
     return 0
+}
+
+is_valid_docker_image() {
+    local image_name="$1"
+    local tag="${2:-latest}"  # Default tag is 'latest' if not provided
+    
+    # Check if the image exists locally
+    if docker image inspect "${image_name}:${tag}" > /dev/null 2>&1; then
+        write_info "is_valid_docker_image" "Docker image '${image_name}:${tag}' is available locally."
+        return 0
+    else
+        write_error "is_valid_docker_image" "Docker image '${image_name}:${tag}' is not available locally."
+        return 1
+    fi
 }
 
 
