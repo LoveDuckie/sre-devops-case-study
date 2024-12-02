@@ -30,6 +30,7 @@ type -f is_valid_docker_context >/dev/null 2>&1 && unset -f is_valid_docker_cont
 type -f is_root >/dev/null 2>&1 && unset -f is_root
 type -f is_valid_docker_builder >/dev/null 2>&1 && unset -f is_valid_docker_builder
 type -f create_docker_builder >/dev/null 2>&1 && unset -f create_docker_builder
+type -f is_valid_docker_image >/dev/null 2>&1 && unset -f is_valid_docker_image
 
 is_root() {
     if [ `whoami` != 'root' ]; then
@@ -270,6 +271,7 @@ is_valid_docker_image() {
 
 
 export -f is_root
+export -f is_valid_docker_image
 export -f is_valid_docker_builder
 export -f create_docker_builder
 export -f write_info

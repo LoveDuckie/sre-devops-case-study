@@ -1,4 +1,5 @@
 import asyncio
+from typing import List, Tuple, Dict, Union
 import aiohttp
 from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
@@ -8,10 +9,8 @@ from rich_click import RichGroup
 import json
 import re
 
-# Set up Rich Console
 console = Console()
 
-# Configure rich-click to use rich styling
 click.Group = RichGroup
 
 # URL validation regex
@@ -23,22 +22,56 @@ URL_REGEX = re.compile(
 )
 
 
-def is_valid_url(url: str):
+def is_valid_url(url: str) -> str:
     """
     Validate the given URL against the regex pattern.
-    :param url:
-    :return:
+    :param url: URL string to validate
+    :return: The same URL if valid
+    :raises ValueError: If the URL is invalid
     """
-    return bool(URL_REGEX.match(url))
+    if not url:
+        raise ValueError("URL cannot be empty")
+    if not URL_REGEX.match(url):
+        raise ValueError(f"Invalid URL: {url}")
+    return url
 
 
-async def fetch_url(session, url):
+def validate_urls(ctx: click.Context, param: click.Parameter, value: List[str]) -> List[str]:
+    """
+    Callback to validate and filter URL options.
+    :param ctx: Click context
+    :param param: Click parameter
+    :param value: List of URLs
+    :return: List of valid URLs
+    """
+    if not value:
+        raise click.BadParameter("No URLs provided.")
+    valid_urls: list[str] = []
+    invalid_urls: list[str] = []
+    for url in value:
+        try:
+            valid_urls.append(is_valid_url(url))
+        except ValueError:
+            invalid_urls.append(url)
+    if invalid_urls:
+        console.print(f"[bold yellow]Warning:[/bold yellow] Invalid URLs ignored: {', '.join(invalid_urls)}")
+    if not valid_urls:
+        raise click.BadParameter("No valid URLs provided.")
+    return valid_urls
+
+
+async def fetch_url(session: aiohttp.ClientSession, url: str) -> Tuple[str, str]:
     """
     Fetch the contents of the page with the URL specified.
-    :param session:
-    :param url:
-    :return:
+    :param session: An aiohttp session
+    :param url: URL to fetch
+    :return: A tuple containing the URL and its HTML content (empty if failed)
     """
+    if not url:
+        raise ValueError("URL cannot be empty")
+
+    if not session:
+        raise ValueError("Session cannot be None")
     try:
         async with session.get(url) as response:
             if response.status != 200:
@@ -50,12 +83,12 @@ async def fetch_url(session, url):
         return url, ""
 
 
-async def extract_links_from_html(url: str, html: str):
+async def extract_links_from_html(url: str, html: str) -> Tuple[str, List[str]]:
     """
     Extract links from the HTML content of a URL.
-    :param url: The absolute URl to retrieve the links from.
-    :param html:
-    :return:
+    :param url: The absolute URL to retrieve the links from
+    :param html: HTML content of the page
+    :return: A tuple containing the base URL and a list of extracted links
     """
     soup = BeautifulSoup(html, "html.parser")
     links = set()
@@ -66,16 +99,16 @@ async def extract_links_from_html(url: str, html: str):
         else:
             # Convert relative URLs to absolute URLs
             links.add(urljoin(url, href))
-    return url, links
+    return url, list(links)
 
 
-async def gather_links(urls: list[str]):
+async def gather_links(urls: List[str]) -> Dict[str, List[str]]:
     """
     Fetch URLs concurrently and extract links.
-    :param urls: The list of URLs to gather links from.
-    :return:
+    :param urls: The list of URLs to gather links from
+    :return: A dictionary mapping domain names to their extracted links
     """
-    results = {}
+    results: Dict[str, List[str]] = {}
     async with aiohttp.ClientSession() as session:
         tasks = [fetch_url(session, url) for url in urls]
         responses = await asyncio.gather(*tasks)
@@ -101,6 +134,7 @@ async def gather_links(urls: list[str]):
     multiple=True,
     required=True,
     help="The URLs to process (can specify multiple).",
+    callback=validate_urls,
 )
 @click.option(
     "-o",
@@ -109,25 +143,14 @@ async def gather_links(urls: list[str]):
     required=True,
     help="Output format: 'stdout' (one absolute URL per line) or 'json'.",
 )
-def main(url: list, output: str):
+def main(url: List[str], output: str) -> None:
     """
     Extract links from specified URLs and output in the desired format.
-    :param url:
-    :param output:
-    :return:
+    :param url: List of input URLs
+    :param output: Output format, either 'stdout' or 'json'
     """
-    # Validate URLs
-    valid_urls = [u for u in url if is_valid_url(u)]
-    if not valid_urls:
-        console.print("[bold red]Error:[/bold red] No valid URLs provided.")
-        return
-
-    invalid_urls = set(url) - set(valid_urls)
-    if invalid_urls:
-        console.print(f"[bold yellow]Warning:[/bold yellow] Invalid URLs ignored: {', '.join(invalid_urls)}")
-
     console.print("[bold cyan]Fetching and extracting links...[/bold cyan]")
-    results = asyncio.run(gather_links(valid_urls))
+    results = asyncio.run(gather_links(url))
 
     if output == "stdout":
         # Output all absolute URLs, one per line

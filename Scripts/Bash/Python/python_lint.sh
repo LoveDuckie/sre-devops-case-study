@@ -18,9 +18,9 @@ PYTHON_PROJECT_PATH=$REPO_ROOT_PATH/Solutions/Python/link-extractor
 pushd $PYTHON_PROJECT_PATH >/dev/null 2>&1
 
 # Run pylint on the specified directory or file
+write_info "python_lint" "Linting: \"$PYTHON_PROJECT_PATH\""
 poetry run pylint .
 
-# Check if pylint completed successfully
 if [ $? -eq 0 ]; then
   write_success "python_lint" "Pylint completed without any errors!"
 else

@@ -18,11 +18,7 @@ if ! is_command_available poetry; then
     exit 1
 fi
 
-pushd "$SOLUTIONS_PATH/Python/link-extractor" >/dev/null 2>&1
-
-poetry build
-
-popd >/dev/null 2>&1
+poetry build -C $SOLUTIONS_PATH/Python/link-extractor
 
 write_success "python_build" "Done"
 exit 0

@@ -15,6 +15,10 @@ write_header
 
 PYTHON_PROJECT_PATH=$REPO_ROOT_PATH/Solutions/Python/link-extractor
 
+if [ ! -d "$PYTHON_PROJECT_PATH" ]; then
+    write_error "python_test" "Failed: Unable to find the path \"$PYTHON_PROJECT_PATH\""
+fi
+
 pushd $PYTHON_PROJECT_PATH >/dev/null 2>&1
 
 write_info "python_test" "Running unit tests"
@@ -31,6 +35,8 @@ fi
 # Generate coverage report
 write_info "python_test" "Generating coverage report..."
 coverage report -m
+
+write_info "python_test" "Generating HTML report..."=
 coverage html
 
 write_success "python_test" "Coverage report generated. Open 'htmlcov/index.html' to view the detailed report."
