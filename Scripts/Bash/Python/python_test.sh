@@ -21,6 +21,9 @@ fi
 
 pushd $PYTHON_PROJECT_PATH >/dev/null 2>&1
 
+write_info "python_test" "Installing dependencies..."
+poetry install
+
 write_info "python_test" "Running unit tests"
 poetry run coverage run --source=. -m unittest discover -s .
 
