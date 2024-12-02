@@ -32,12 +32,26 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
+      - name: Save Poetry
+        uses: actions/upload-artifact@v3
+        with:
+          name: poetry-bin
+          path: $HOME/.local/bin
+
   install-dependencies:
     needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Download Poetry
+        uses: actions/download-artifact@v3
+        with:
+          name: poetry-bin
+
+      - name: Add Poetry to PATH
+        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
 
       - name: Install Dependencies
         run: |
@@ -51,6 +65,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Download Poetry
+        uses: actions/download-artifact@v3
+        with:
+          name: poetry-bin
+
+      - name: Add Poetry to PATH
+        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
+
       - name: Lint
         run: ./Scripts/Bash/Python/python_lint.sh
 
@@ -61,6 +83,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Download Poetry
+        uses: actions/download-artifact@v3
+        with:
+          name: poetry-bin
+
+      - name: Add Poetry to PATH
+        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
+
       - name: Run Tests
         run: ./Scripts/Bash/Python/python_test.sh
 
@@ -70,6 +100,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Download Poetry
+        uses: actions/download-artifact@v3
+        with:
+          name: poetry-bin
+
+      - name: Add Poetry to PATH
+        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
 
       - name: Build Package
         run: ./Scripts/Bash/Python/python_build.sh
@@ -87,20 +125,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Download Poetry
+        uses: actions/download-artifact@v3
         with:
-          python-version: "3.11"
+          name: poetry-bin
 
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Install Dependencies
-        run: |
-          cd Solutions/Python/link-extractor
-          poetry install
+      - name: Add Poetry to PATH
+        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
 
       - name: Bump Version
         run: |
@@ -114,15 +145,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Download Poetry
+        uses: actions/download-artifact@v3
         with:
-          python-version: "3.11"
+          name: poetry-bin
 
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Add Poetry to PATH
+        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
 
       - name: Determine Version
         id: version
