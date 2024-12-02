@@ -20,7 +20,7 @@ on:
           - major
 
 jobs:
-  setup:
+  install-dependencies:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -32,30 +32,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Save Poetry
-        uses: actions/upload-artifact@v3
-        with:
-          name: poetry-bin
-          path: $HOME/.local/bin
-
-  install-dependencies:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Download Poetry
-        uses: actions/download-artifact@v3
-        with:
-          name: poetry-bin
-
-      - name: Add Poetry to PATH
-        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
+        uses: ./.github/actions/install-poetry.yml
 
       - name: Install Dependencies
         run: |
@@ -69,13 +46,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Download Poetry
-        uses: actions/download-artifact@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          name: poetry-bin
+          python-version: "3.11"
 
-      - name: Add Poetry to PATH
-        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
+      - name: Install Poetry
+        uses: ./.github/actions/install-poetry.yml
 
       - name: Lint
         run: ./Scripts/Bash/Python/python_lint.sh
@@ -87,13 +64,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Download Poetry
-        uses: actions/download-artifact@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          name: poetry-bin
+          python-version: "3.11"
 
-      - name: Add Poetry to PATH
-        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
+      - name: Install Poetry
+        uses: ./.github/actions/install-poetry.yml
 
       - name: Run Tests
         run: ./Scripts/Bash/Python/python_test.sh
@@ -108,13 +85,13 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Poetry
-        uses: actions/download-artifact@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          name: poetry-bin
+          python-version: "3.11"
 
-      - name: Add Poetry to PATH
-        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
+      - name: Install Poetry
+        uses: ./.github/actions/install-poetry.yml
 
       - name: Conditional Version Bump and Commit
         run: |
@@ -139,13 +116,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Download Poetry
-        uses: actions/download-artifact@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          name: poetry-bin
+          python-version: "3.11"
 
-      - name: Add Poetry to PATH
-        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
+      - name: Install Poetry
+        uses: ./.github/actions/install-poetry.yml
 
       - name: Build Package
         run: ./Scripts/Bash/Python/python_build.sh
@@ -163,13 +140,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Download Poetry
-        uses: actions/download-artifact@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          name: poetry-bin
+          python-version: "3.11"
 
-      - name: Add Poetry to PATH
-        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
+      - name: Install Poetry
+        uses: ./.github/actions/install-poetry.yml
 
       - name: Determine Version
         id: version
