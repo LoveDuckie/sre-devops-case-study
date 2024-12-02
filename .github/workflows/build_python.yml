@@ -9,11 +9,15 @@ on:
       - "Solutions/Python/link-extractor/**"
   workflow_dispatch:
     inputs:
-      bump_version:
-        description: "Bump version (manual trigger)"
-        required: false
-        default: false
-        type: boolean
+      bump_type:
+        description: "Type of version bump (manual trigger)"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   setup:
@@ -94,8 +98,42 @@ jobs:
       - name: Run Tests
         run: ./Scripts/Bash/Python/python_test.sh
 
+  bump-version:
+    needs: [lint, test]
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Poetry
+        uses: actions/download-artifact@v3
+        with:
+          name: poetry-bin
+
+      - name: Add Poetry to PATH
+        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
+
+      - name: Conditional Version Bump and Commit
+        run: |
+          echo "Checking if workflow was triggered by dispatch..."
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Bumping version..."
+            cd Solutions/Python/link-extractor
+            poetry version ${{ github.event.inputs.bump_type }}
+            git config --global user.name "GitHub Actions"
+            git config --global user.email "actions@github.com"
+            git add pyproject.toml
+            git commit -m "Bump version: ${{ github.event.inputs.bump_type }}"
+            git push origin ${{ github.ref_name }}
+          else
+            echo "Not a workflow_dispatch event. Skipping version bump."
+          fi
+
   build:
-    needs: test
+    needs: [bump-version]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -118,28 +156,8 @@ jobs:
           name: link-extractor-package
           path: Solutions/Python/link-extractor/dist/
 
-  bump-version:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Download Poetry
-        uses: actions/download-artifact@v3
-        with:
-          name: poetry-bin
-
-      - name: Add Poetry to PATH
-        run: echo "$GITHUB_WORKSPACE/poetry-bin" >> $GITHUB_PATH
-
-      - name: Bump Version
-        run: |
-          cd Solutions/Python/link-extractor
-          poetry version patch
-
   create-release:
-    needs: bump-version
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
