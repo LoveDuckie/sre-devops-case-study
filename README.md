@@ -1,16 +1,16 @@
 <div align="center">
 
-# sre-devops-case-study
+# 📚 sre-devops-case-study
+
+This project showcases the technical assignment for a company named *[REDACTED]*.
 
 </div>
 
-This repository contains the technical assignment for a company named *[REDACTED]*.
-
 ---
 
-## Repository Layout
+## 📂 Repository Layout
 
-Below is an overview of the repository structure with a description of each path:
+An overview of the repository structure, including descriptions for each key path:
 
 ```plaintext
 .
@@ -45,104 +45,131 @@ Below is an overview of the repository structure with a description of each path
         └── link-extractor
 ```
 
-### 📁 Binaries
+### 📁 **Binaries**
 
-Contains the built binaries for the .NET version of the `LinkExtractor`.
+- Contains the compiled binaries for the `.NET` version of the `LinkExtractor`.
 
-### 📁 Helm
+### 📁 **Helm**
 
-Contains charts and configuration values for deploying Helm Charts to a single-node Kubernetes cluster (locally, with Docker Desktop.)
+- Holds Helm charts and configuration values for deploying components in a single-node Kubernetes cluster (e.g., Docker Desktop).
 
-### 📁 Scripts
+### 📁 **Scripts**
 
-Contains helper scripts for a variety of purposes.
+- Contains helper scripts for a range of tasks:
+  - **`Bash`**
+    - Automates operations such as:
+      - **Charts**: Scripts for linting, packaging, and deploying Helm charts.
+      - **Docker**: Scripts for building and pushing container images.
+      - **DotNet**: Scripts for testing, building, and packaging `.NET` applications.
+      - **Part4**: Scripts fulfilling the "Part 4" case study requirements.
+      - **Python**: Scripts for linting, testing, formatting, and versioning Python projects.
+    - General scripts, such as `service_*.sh`, for managing `docker-compose` projects (e.g., GitLab services in the `Services` folder).
+  - **`PowerShell`**
+    - PowerShell alternatives to Bash scripts where applicable.
 
-- `Bash`
-  - Scripts for automating various operations. These are primarily used.
-    - `Charts`
-      - Contains helper scripts for linting, packaging, and deploying `helm` charts.
-    - `Docker`
-      - Contains helper scripts for building and pushing container images.
-    - `DotNet`
-      - Contains helper scripts for testing, building, packaging, and pushing nuget packages for the .NET application.
-    - `Part4`
-      - Contains scripts that fulfill the criteria for "part 4" of the case study.
-    - `Python`
-      - Contains helper scripts for linting, formatting, testing, versioning, and packaging the Python application.
-  - `service_*.sh`
-    - Scripts for starting and stopping `docker-compose` projects (i.e. GitLab) that can be found under `Services` in this repository, see below.
+### 📁 **Services**
 
-### 📁 Services
+- Includes `docker-compose` projects for deploying services, such as GitLab, needed for demonstration purposes.
 
-`docker-compose` projects for deploying or installing services required for demonstrative purposes.
+### 📁 **Solutions**
 
-### 📁 Solutions
-
-Contains source code for projects targeting either .NET or Python.
+- Contains source code for the **LinkExtractor** application:
+  - **DotNet**: `.NET` version of the application.
+  - **Python**: Python version of the application.
 
 ---
 
-## Overview
+## 🛠️ Project Overview
 
-This project solution comprises of several components.
+The project solution is divided into the following components:
 
-1. The **application**.
-2. The **container**.
-3. The **deployment**.
-4. The **pipelines**.
+1. **Application**: The main functionality.
+2. **Container**: A containerized version of the application.
+3. **Deployment**: Kubernetes deployment using Helm.
+4. **Pipelines**: CI/CD pipelines for automation.
 
-### The Application
+---
 
-The **application** is a Python project that can be found at the following path.
+### 💻 The Application
+
+The **application** is a Python-based project located at:
 
 ```plaintext
 Solutions/Python/link-extractor
 ```
 
+#### Tools & Technologies
+
+- **Poetry**: For project and dependency management.
+- **Pipx**: Installs tools in isolated environments, avoiding global system pollution.
+- **Virtualenv**: Creates isolated environments for package installations.
+- **Pyenv**: Manages multiple Python versions on the same system.
+
+#### Key Features
+
+- Developed using the `click` framework for CLI management and validation.
+- Implements parallel link processing for efficient scraping.
+- Utilizes `aiohttp` for asynchronous HTTP requests with `asyncio.gather`.
+- Structured using `poetry`, adhering to PEP standards with `pyproject.toml`.
+- Unit tests are scaffolded using `unittest`.
+
+---
+
+### 🐳 The Container Image
+
+The **container image** is based on the official Python 3.11 base image.
+
+#### Key Features
+
+- **Multi-stage builds** for improved caching and performance.
+- Parameterized Dockerfile supporting `UID` and `Version Number`.
+- Application packaging occurs in the `build` stage, reducing final image size by excluding development dependencies (e.g., `poetry`).
+- Includes a `HEALTHCHECK` to monitor the container's status.
+
+---
+
+### ☸️ The Deployment
+
+The **deployment** leverages Kubernetes and tools like `helm` and `helmfile` to manage resources.
+
 #### Tools
 
-- `poetry`
-  - Project and dependnecy management.
-- `pipx`
-  - Installing tools and their dependencies as isolated environments, to mitigate pollution with system-wide installed packages.
-- `virtualenv`
-  - Creating virtual environments for installing packages to in isolation.
-- `pyenv`
-  - Managing and installing multiple versions of Python on the same system.
+- **Helm**: Defines and packages Kubernetes resources into reusable, templated charts.
+- **Helmfile**: Ensures Helm charts are properly registered and downloaded, supporting additional tools like `trivy` and `falco`.
 
-#### Considerations
+#### Key Features
 
-- The application was developed using the `click` framework for managing and validating command-line application.
-- Links scraped from input URLs are processed in parallel where possible.
-- The library used for invoking HTTP requests is `aiohttp` which enables us to use `async`/`await` behaviour and `await` scraping tasks that are running concurrently with `asyncio.gather`.
-- The project is initialized and managed using a tool called `poetry`.
-- The `pyproject.toml` file is compliant with Python Enhance Proposals for project and build tooling (PEP).
-- The project uses `unittest` for scaffolding unit tests.
+- The Helm chart deploys a single `Pod` with a `restartPolicy` of `Never`, per assignment requirements.
 
-### The Container Image
+---
 
-The **container image** is based off the official base image for Python 3.11.
+### 🚀 The Pipelines
 
-#### Considerations
+The **pipelines** are implemented using GitHub Actions workflows (located in `.github`), automating the following tasks:
 
-- The Dockerfile is structured to leverage multi-stage builds for enhanced caching and performance.
-- The Dockerfile takes several parameters including a "`UID`" and "`Version Number`".
-- The Python application is packaged in the `build` stage of the Dockerfile, and is later copied to the final stage that doesn't include all the additional tooling required for packaging and distributing the application (i.e. `poetry`).
-- The Dockerfile defines a `HEALTHCHECK` to ensure that the Python process is running.
+#### Python Pipeline
 
-### The Deployment
+1. Install Poetry.
+2. Lint and Test.
+3. Bump Version (manual trigger only).
+4. Build.
+5. Upload Artifact.
+6. Publish Release.
 
-The **deployment** for this project is achieved using Kubernetes and supporting tools such as `helm` and `helmfile`.
+#### Docker Pipeline
 
-#### Tools
+1. Build Multi-platform Images.
+2. Push to Docker Hub.
 
-- `helm` is used for defining multiple Kubernetes resource definitions and packaging them into a single deployable entity. They are templated ahead-of-time using the Go templating engine.
-- `helmfile` is used for ensuring that all `helm` chart repositories are registered and downloaded ahead-of-time so that we can install additional security scanning services such as `trivy` or `falco`.
+#### Helm Pipeline
 
-#### Considerations
+1. Lint Charts.
+2. Bump Chart Version.
 
-- The `helm` chart for the application contains one resource, which is a singular `Pod` definition for the container image. It uses a `restartPolicy` of "`never`", meaning that once the application runs to completion, it will remain there indefinitely. This is laid out as the requirement for this test.
+---
 
-### The Pipelines
+### ✨ Highlights
 
-The **pipelines** for this project are described using GitLab Actions workflows, which can be found in this project under `.github`.
+- **Scalable Design**: Efficient use of Python's async capabilities for parallel processing.
+- **Streamlined CI/CD**: Pipelines automate the entire lifecycle, from linting to publishing.
+- **Security Integration**: Uses `trivy` and `falco` for security scanning.
