@@ -173,3 +173,13 @@ The **pipelines** are implemented using GitHub Actions workflows (located in `.g
 - **Scalable Design**: Efficient use of Python's async capabilities for parallel processing.
 - **Streamlined CI/CD**: Pipelines automate the entire lifecycle, from linting to publishing.
 - **Security Integration**: Uses `trivy` and `falco` for security scanning.
+
+---
+
+### Design Considerations
+
+#### Application
+
+The **application**, as specified by the test requirements, states that it must run to completion and terminate in a halted state. As in to say, once the application runs to completion and provides an exit-code, nothing further should happen to the Kubernetes resources used for deploying the **application**.
+
+However, there are some deficiencies with this **application** that I am aware of, including the inability to perform "rolling updates", or "blue/green" and "canary" deployments. The reason for this is because there is no incoming traffic for this particular application.

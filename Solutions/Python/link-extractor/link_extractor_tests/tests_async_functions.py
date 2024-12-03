@@ -1,69 +1,143 @@
 import unittest
-from unittest.mock import AsyncMock, patch
-
-import aiohttp
-from aiohttp import ClientResponseError
-
-from link_extractor.__main__ import gather_links, extract_links_from_html, fetch_url
+from aiohttp import web
+from aiohttp.test_utils import AioHTTPTestCase
 
 
-class TestAsyncFunctions(unittest.IsolatedAsyncioTestCase):
+class TestAsyncFunctions(AioHTTPTestCase):
     """
-    Test cases for asynchronous functions related to URL fetching and HTML parsing.
+    Test cases for asynchronous functions using AioHTTPTestCase.
     """
 
-    @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
-    async def test_fetch_url_success(self, mock_get: AsyncMock) -> None:
+    async def get_application(self):
         """
-        Test fetch_url when the URL fetch is successful.
-        """
-        mock_response = AsyncMock()
-        mock_response.status = 200
-        mock_response.text = AsyncMock(return_value="Fake HTML Content")
-        mock_get.return_value.__aenter__.return_value = mock_response
+        Create a mock application to simulate server responses.
 
-        url = "http://example.com"
-        async with aiohttp.ClientSession() as session:
+        The mock application defines routes and their corresponding handlers:
+
+        - `/page1`: Returns an HTML response with a link to `/page2`.
+        - `/page2`: Returns an HTML response with a link to `/page3`.
+        - `/not-found`: Returns a 404 Not Found response.
+
+        :return: An instance of the mock web application.
+        :rtype: aiohttp.web.Application
+        """
+
+        async def page1_handler(request):
+            """
+            Handler for `/page1`.
+
+            :param request: The HTTP request object.
+            :type request: aiohttp.web.Request
+            :return: A response with an HTML link to `/page2`.
+            :rtype: aiohttp.web.Response
+            """
+            return web.Response(text="<a href='/page2'>Link</a>")
+
+        async def page2_handler(request):
+            """
+            Handler for `/page2`.
+
+            :param request: The HTTP request object.
+            :type request: aiohttp.web.Request
+            :return: A response with an HTML link to `/page3`.
+            :rtype: aiohttp.web.Response
+            """
+            return web.Response(text="<a href='/page3'>Link</a>")
+        
+        async def success_handler(request):
+            """
+            Handler for `/page2`.
+
+            :param request: The HTTP request object.
+            :type request: aiohttp.web.Request
+            :return: A response with an HTML link to `/page3`.
+            :rtype: aiohttp.web.Response
+            """
+            return web.Response(text="Fake HTML Content")
+
+        async def not_found_handler(request):
+            """
+            Handler for `/not-found`.
+
+            :param request: The HTTP request object.
+            :type request: aiohttp.web.Request
+            :return: A 404 Not Found response.
+            :rtype: aiohttp.web.Response
+            """
+            return web.Response(status=404)
+
+        app = web.Application()
+        app.router.add_get("/page1", page1_handler)
+        app.router.add_get("/page2", page2_handler)
+        app.router.add_get("/success", success_handler)
+        app.router.add_get("/not-found", not_found_handler)
+        return app
+
+    async def test_fetch_url_success(self):
+        """
+        Test the `fetch_url` function for a successful request.
+
+        Ensures that the function correctly fetches content from a URL and
+        returns the URL and its HTML content.
+
+        :return: None
+        """
+        from link_extractor.__main__ import fetch_url
+
+        url = self.server.make_url("/success")
+        async with self.client.session as session:
             fetched_url, content = await fetch_url(session, url)
 
         self.assertEqual(fetched_url, url)
         self.assertEqual(content, "Fake HTML Content")
 
-    @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
-    async def test_fetch_url_error(self, mock_get: AsyncMock) -> None:
+    async def test_fetch_url_error(self):
         """
-        Test fetch_url when the server returns a non-200 status code.
-        """
-        mock_response = AsyncMock()
-        mock_response.status = 404
-        mock_response.text = AsyncMock(return_value="")
-        mock_get.return_value.__aenter__.return_value = mock_response
+        Test the `fetch_url` function for a 404 Not Found response.
 
-        url = "http://example.com"
-        async with aiohttp.ClientSession() as session:
+        Ensures that the function correctly handles a 404 status code and
+        returns the URL with an empty content string.
+
+        :return: None
+        """
+        from link_extractor.__main__ import fetch_url
+
+        url = self.server.make_url("/not-found")
+        async with self.client.session as session:
             fetched_url, content = await fetch_url(session, url)
 
         self.assertEqual(fetched_url, url)
         self.assertEqual(content, "")
 
-    @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
-    async def test_fetch_url_exception(self, mock_get: AsyncMock) -> None:
+    async def test_fetch_url_exception(self):
         """
-        Test fetch_url when an exception is raised during the request.
-        """
-        mock_get.side_effect = ClientResponseError(None, None, status=500)
+        Test the `fetch_url` function for an unreachable host.
 
-        url = "http://example.com"
-        async with aiohttp.ClientSession() as session:
+        Ensures that the function correctly handles exceptions and
+        returns the URL with an empty content string.
+
+        :return: None
+        """
+        from link_extractor.__main__ import fetch_url
+
+        url = "http://nonexistent.url"
+        async with self.client.session as session:
             fetched_url, content = await fetch_url(session, url)
 
         self.assertEqual(fetched_url, url)
         self.assertEqual(content, "")
 
-    async def test_extract_links_from_html(self) -> None:
+    async def test_extract_links_from_html(self):
         """
-        Test extract_links_from_html for correct link extraction and conversion of relative URLs.
+        Test the `extract_links_from_html` function.
+
+        Ensures that the function correctly extracts absolute and relative links
+        from HTML content and excludes non-HTTP links.
+
+        :return: None
         """
+        from link_extractor.__main__ import extract_links_from_html
+
         url = "http://example.com"
         html = """
         <html>
@@ -71,6 +145,7 @@ class TestAsyncFunctions(unittest.IsolatedAsyncioTestCase):
                 <a href="http://example.com/page1">Page 1</a>
                 <a href="/page2">Page 2</a>
                 <a href="mailto:someone@example.com">Email</a>
+                <a href="#fragment">Fragment</a>
             </body>
         </html>
         """
@@ -78,31 +153,32 @@ class TestAsyncFunctions(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(fetched_url, url)
         self.assertIn("http://example.com/page1", links)
-        self.assertIn("http://example.com/page2", links)  # Relative converted to absolute
-        self.assertNotIn("mailto:someone@example.com", links)  # Non-HTTP link excluded
+        self.assertIn("http://example.com/page2", links)
+        self.assertIn("http://example.com#fragment", links)
+        self.assertNotIn("mailto:someone@example.com", links)
 
-    @patch("aiohttp.ClientSession.get", new_callable=AsyncMock)
-    async def test_gather_links(self, mock_get: AsyncMock) -> None:
+    async def test_gather_links(self):
         """
-        Test gather_links to verify concurrent URL fetching and link extraction.
+        Test the `gather_links` function.
+
+        Ensures that the function correctly fetches content from multiple URLs,
+        extracts links from the content, and organizes the results by domain.
+
+        :return: None
         """
-        mock_response_1 = AsyncMock()
-        mock_response_1.status = 200
-        mock_response_1.text = AsyncMock(return_value="<a href='http://example.com/page1'>Link</a>")
+        from link_extractor.__main__ import gather_links
 
-        mock_response_2 = AsyncMock()
-        mock_response_2.status = 200
-        mock_response_2.text = AsyncMock(return_value="<a href='/page2'>Link</a>")
+        server_url = str(self.server.make_url("/"))  # Convert to string
+        urls = [f"{server_url}page1", f"{server_url}page2"]
 
-        mock_get.side_effect = [
-            mock_response_1,
-            mock_response_2,
-        ]
-
-        urls = ["http://example.com", "http://example2.com"]
         results = await gather_links(urls)
 
-        self.assertIn("http://example.com", results)
-        self.assertIn("http://example2.com", results)
-        self.assertIn("/page1", results["http://example.com"])
-        self.assertIn("/page2", results["http://example2.com"])
+        server_url_base = server_url.rstrip("/")
+
+        self.assertIn(server_url_base, results)
+        self.assertIn("/page2", results[server_url_base])
+        self.assertIn("/page3", results[server_url_base])
+
+
+if __name__ == "__main__":
+    unittest.main()

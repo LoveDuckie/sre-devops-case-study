@@ -15,3 +15,5 @@ export REPO_ROOT_PATH=${REPO_ROOT_PATH:-$(realpath $SHARED_EXT_SCRIPTS_PATH/../.
 export HELM_CHARTS_PATH="$REPO_ROOT_PATH/Helm/Charts"
 export SERVICES_PATH="$REPO_ROOT_PATH/Services"
 export SOLUTIONS_PATH="$REPO_ROOT_PATH/Solutions"
+
+export PYTHON_PROJECT_PATH=$REPO_ROOT_PATH/Solutions/Python/link-extractor

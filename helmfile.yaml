@@ -19,7 +19,7 @@ releases:
     namespace: kube-system
     chart: kubernetes-dashboard/kubernetes-dashboard
     values:
-      - ./values_dashboard.yaml
+      - ./Helm/Values/Dashboard/values.yaml
 
   - name: falco
     namespace: security

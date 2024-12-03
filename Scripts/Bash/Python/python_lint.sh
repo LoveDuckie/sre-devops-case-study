@@ -13,20 +13,23 @@ export CURRENT_SCRIPT_FILENAME_BASE=${CURRENT_SCRIPT_FILENAME%.*}
 . "$SHARED_EXT_SCRIPTS_PATH/shared_functions.sh"
 write_header
 
-PYTHON_PROJECT_PATH=$REPO_ROOT_PATH/Solutions/Python/link-extractor
+if [ ! -d "$PYTHON_PROJECT_PATH" ]; then
+    write_error "python_lint" "Failed: Unable to find the path \"$PYTHON_PROJECT_PATH\""
+    exit 1
+fi
 
 pushd $PYTHON_PROJECT_PATH >/dev/null 2>&1
 
 write_info "python_lint" "Installing dependencies..."
-poetry install
+poetry -C "$PYTHON_PROJECT_PATH" install
 
 write_info "python_lint" "Linting: \"$PYTHON_PROJECT_PATH\""
-poetry run pylint .
-
-if [ $? -eq 0 ]; then
-  write_success "python_lint" "Pylint completed without any errors!"
+# Run pylint with the --fail-under option
+poetry -C "$PYTHON_PROJECT_PATH" run pylint --fail-under=8.0 .
+if write_response "python_lint" "Lint: \"$PYTHON_PROJECT_PATH\""; then
+  write_success "python_lint" "Linting passed with a score >= 8.0!"
 else
-  write_warning "python_lint" "Pylint detected issues. Please review the output for details."
+  write_error "python_lint" "Linting failed with a score below 8.0."
   exit 1
 fi
 

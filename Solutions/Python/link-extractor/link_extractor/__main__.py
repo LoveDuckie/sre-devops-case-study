@@ -1,5 +1,7 @@
 import asyncio
-from typing import List, Tuple, Dict, Union
+import sys
+import logging
+from typing import List, Tuple, Dict
 import aiohttp
 from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
@@ -25,9 +27,12 @@ URL_REGEX = re.compile(
 def is_valid_url(url: str) -> str:
     """
     Validate the given URL against the regex pattern.
-    :param url: URL string to validate
-    :return: The same URL if valid
-    :raises ValueError: If the URL is invalid
+
+    :param url: The URL string to validate.
+    :type url: str
+    :return: The same URL if valid.
+    :rtype: str
+    :raises ValueError: If the URL is invalid or empty.
     """
     if not url:
         raise ValueError("URL cannot be empty")
@@ -38,16 +43,22 @@ def is_valid_url(url: str) -> str:
 
 def validate_urls(ctx: click.Context, param: click.Parameter, value: List[str]) -> List[str]:
     """
-    Callback to validate and filter URL options.
-    :param ctx: Click context
-    :param param: Click parameter
-    :param value: List of URLs
-    :return: List of valid URLs
+    Validate and filter a list of URL options.
+
+    :param ctx: The Click context.
+    :type ctx: click.Context
+    :param param: The Click parameter.
+    :type param: click.Parameter
+    :param value: The list of URLs to validate.
+    :type value: List[str]
+    :return: A list of valid URLs.
+    :rtype: List[str]
+    :raises click.BadParameter: If no valid URLs are provided.
     """
     if not value:
         raise click.BadParameter("No URLs provided.")
-    valid_urls: list[str] = []
-    invalid_urls: list[str] = []
+    valid_urls: List[str] = []
+    invalid_urls: List[str] = []
     for url in value:
         try:
             valid_urls.append(is_valid_url(url))
@@ -62,51 +73,63 @@ def validate_urls(ctx: click.Context, param: click.Parameter, value: List[str]) 
 
 async def fetch_url(session: aiohttp.ClientSession, url: str) -> Tuple[str, str]:
     """
-    Fetch the contents of the page with the URL specified.
-    :param session: An aiohttp session
-    :param url: URL to fetch
-    :return: A tuple containing the URL and its HTML content (empty if failed)
+    Fetch the content of a URL using an aiohttp session.
+
+    :param session: The aiohttp session.
+    :type session: aiohttp.ClientSession
+    :param url: The URL to fetch.
+    :type url: str
+    :return: A tuple containing the URL and its HTML content (empty if failed).
+    :rtype: Tuple[str, str]
+    :raises ValueError: If the URL or session is invalid.
     """
     if not url:
         raise ValueError("URL cannot be empty")
-
     if not session:
         raise ValueError("Session cannot be None")
     try:
         async with session.get(url) as response:
             if response.status != 200:
-                console.print(f"[bold red]Error:[/bold red] Failed to fetch {url} (status code: {response.status})")
+                logging.error(f"Failed to fetch {url} (status code: {response.status})")
                 return url, ""
             return url, await response.text()
     except Exception as e:
-        console.print(f"[bold red]Error:[/bold red] Failed to fetch {url} ({e})")
+        logging.error(f"Failed to fetch {url} ({e})")
         return url, ""
 
 
 async def extract_links_from_html(url: str, html: str) -> Tuple[str, List[str]]:
     """
     Extract links from the HTML content of a URL.
-    :param url: The absolute URL to retrieve the links from
-    :param html: HTML content of the page
-    :return: A tuple containing the base URL and a list of extracted links
+
+    :param url: The base URL to resolve relative links.
+    :type url: str
+    :param html: The HTML content to parse.
+    :type html: str
+    :return: A tuple containing the base URL and a list of extracted links.
+    :rtype: Tuple[str, List[str]]
     """
     soup = BeautifulSoup(html, "html.parser")
     links = set()
     for a_tag in soup.find_all("a", href=True):
         href = a_tag["href"]
+        if href.startswith("mailto:"):
+            continue
         if href.startswith("http"):
             links.add(href)
         else:
-            # Convert relative URLs to absolute URLs
             links.add(urljoin(url, href))
     return url, list(links)
 
 
 async def gather_links(urls: List[str]) -> Dict[str, List[str]]:
     """
-    Fetch URLs concurrently and extract links.
-    :param urls: The list of URLs to gather links from
-    :return: A dictionary mapping domain names to their extracted links
+    Fetch multiple URLs concurrently and extract links.
+
+    :param urls: A list of URLs to fetch and process.
+    :type urls: List[str]
+    :return: A dictionary mapping domains to their extracted links.
+    :rtype: Dict[str, List[str]]
     """
     results: Dict[str, List[str]] = {}
     async with aiohttp.ClientSession() as session:
@@ -121,8 +144,12 @@ async def gather_links(urls: List[str]) -> Dict[str, List[str]]:
         for base_url, links in extracted_links:
             parsed_url = urlparse(base_url)
             domain = f"{parsed_url.scheme}://{parsed_url.netloc}"
-            relative_links = [urlparse(link).path for link in links]
-            results[domain] = relative_links
+
+            # If the domain already exists, append links; otherwise, create a new entry
+            if domain in results:
+                results[domain].extend([urlparse(link).path for link in links])
+            else:
+                results[domain] = [urlparse(link).path for link in links]
 
     return results
 
@@ -143,24 +170,43 @@ async def gather_links(urls: List[str]) -> Dict[str, List[str]]:
     required=True,
     help="Output format: 'stdout' (one absolute URL per line) or 'json'.",
 )
-def main(url: List[str], output: str) -> None:
+@click.option(
+    "-l",
+    "--verbosity",
+    type=click.Choice([logging.getLevelName(level) for level in logging._nameToLevel if isinstance(level, str)],
+                      case_sensitive=False),
+    required=True,
+    help="Set the logging level for the application.",
+)
+def main(url: List[str], output: str, verbosity: str) -> None:
     """
-    Extract links from specified URLs and output in the desired format.
-    :param url: List of input URLs
-    :param output: Output format, either 'stdout' or 'json'
+    Extract links from specified URLs and output the results in the desired format.
+
+    :param url: The list of input URLs.
+    :type url: List[str]
+    :param output: The output format ('stdout' or 'json').
+    :type output: str
+    :param verbosity: The logging level for the application.
+    :type verbosity: str
     """
-    console.print("[bold cyan]Fetching and extracting links...[/bold cyan]")
+    logging.basicConfig(level=logging._nameToLevel[verbosity.upper()], format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.info("Starting the application...")
     results = asyncio.run(gather_links(url))
 
     if output == "stdout":
-        # Output all absolute URLs, one per line
         for domain, paths in results.items():
             absolute_urls = [f"{domain}{path}" for path in paths]
             console.print("\n".join(absolute_urls))
     elif output == "json":
-        # Output JSON hash
         console.print(json.dumps(results, indent=4))
 
 
 if __name__ == "__main__":
-    main()
+    """
+    Entry point for the application. Handles exceptions and logging setup.
+    """
+    try:
+        main()
+    except Exception as err:
+        logging.error(f"Application error: {err}")
+        sys.exit(-1)
