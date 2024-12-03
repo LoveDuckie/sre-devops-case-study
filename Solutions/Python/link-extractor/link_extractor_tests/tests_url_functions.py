@@ -1,3 +1,6 @@
+"""
+Tests: URL Validation Functions
+"""
 import unittest
 
 from link_extractor.__main__ import (
@@ -11,6 +14,10 @@ class TestURLFunctions(unittest.TestCase):
     """
 
     def test_is_valid_url(self) -> None:
+        """
+        Test a set of URLs to determine if they are valid.
+        :return:
+        """
         valid_urls = [
             "http://example.com",
             "https://example.com",

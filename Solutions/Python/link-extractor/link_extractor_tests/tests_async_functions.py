@@ -31,6 +31,8 @@ class TestAsyncFunctions(AioHTTPTestCase):
             :return: A response with an HTML link to `/page2`.
             :rtype: aiohttp.web.Response
             """
+            if not request:
+                raise ValueError("The request is invalid or null")
             return web.Response(text="<a href='/page2'>Link</a>")
 
         async def page2_handler(request):
@@ -42,6 +44,8 @@ class TestAsyncFunctions(AioHTTPTestCase):
             :return: A response with an HTML link to `/page3`.
             :rtype: aiohttp.web.Response
             """
+            if not request:
+                raise ValueError("The request is invalid or null")
             return web.Response(text="<a href='/page3'>Link</a>")
         
         async def success_handler(request):
@@ -53,6 +57,8 @@ class TestAsyncFunctions(AioHTTPTestCase):
             :return: A response with an HTML link to `/page3`.
             :rtype: aiohttp.web.Response
             """
+            if not request:
+                raise ValueError("The request is invalid or null")
             return web.Response(text="Fake HTML Content")
 
         async def not_found_handler(request):

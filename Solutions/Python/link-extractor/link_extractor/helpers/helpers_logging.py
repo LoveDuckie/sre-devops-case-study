@@ -1,3 +1,6 @@
+"""
+Helper functions for logging
+"""
 import logging
 import os
 import sys
@@ -7,6 +10,7 @@ import logging.handlers
 from link_extractor import __title__
 from link_extractor.helpers.helpers_datetime import get_time_formatted
 
+_logger: logging.Logger | None = None
 
 def get_default_log_filename() -> str:
     """
@@ -32,10 +36,18 @@ def _create_logging_handlers(logger: logging.Logger):
     logger.addHandler(logging.handlers.RotatingFileHandler(get_default_log_filepath()))
 
 def _create_logger() -> logging.Logger:
+    """
+    Create the logger instance
+    :return:
+    """
     global _logger
     _logger = logging.Logger(__title__)
     _create_logging_handlers(_logger)
     return _logger
 
 def get_or_create_logger():
+    """
+    Get the logger if it already exists, otherwise create.
+    :return:
+    """
     return logging.getLogger(__name__)

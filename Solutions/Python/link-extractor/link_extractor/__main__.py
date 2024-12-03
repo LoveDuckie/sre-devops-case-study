@@ -1,15 +1,18 @@
+"""
+The main application
+"""
 import asyncio
+from urllib.parse import urljoin, urlparse
 import sys
 import logging
+import json
+import re
 from typing import List, Tuple, Dict
 import aiohttp
-from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 import rich_click as click
 from rich.console import Console
 from rich_click import RichGroup
-import json
-import re
 
 console = Console()
 
@@ -55,6 +58,11 @@ def validate_urls(ctx: click.Context, param: click.Parameter, value: List[str]) 
     :rtype: List[str]
     :raises click.BadParameter: If no valid URLs are provided.
     """
+    if not ctx:
+        ValueError("The context is invalid or null")
+
+    if not param:
+        raise ValueError("The click parameter is invalid or null")
     if not value:
         raise click.BadParameter("No URLs provided.")
     valid_urls: List[str] = []
@@ -65,7 +73,8 @@ def validate_urls(ctx: click.Context, param: click.Parameter, value: List[str]) 
         except ValueError:
             invalid_urls.append(url)
     if invalid_urls:
-        console.print(f"[bold yellow]Warning:[/bold yellow] Invalid URLs ignored: {', '.join(invalid_urls)}")
+        console.print(f"[bold yellow]Warning:[/bold yellow] "
+                      f"Invalid URLs ignored: {', '.join(invalid_urls)}")
     if not valid_urls:
         raise click.BadParameter("No valid URLs provided.")
     return valid_urls
@@ -173,8 +182,9 @@ async def gather_links(urls: List[str]) -> Dict[str, List[str]]:
 @click.option(
     "-l",
     "--verbosity",
-    type=click.Choice([logging.getLevelName(level) for level in logging._nameToLevel if isinstance(level, str)],
-                      case_sensitive=False),
+    type=click.Choice(
+        [logging.getLevelName(level) for level in logging._nameToLevel if isinstance(level, str)],
+        case_sensitive=False),
     required=True,
     help="Set the logging level for the application.",
 )
@@ -189,7 +199,8 @@ def main(url: List[str], output: str, verbosity: str) -> None:
     :param verbosity: The logging level for the application.
     :type verbosity: str
     """
-    logging.basicConfig(level=logging._nameToLevel[verbosity.upper()], format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging._nameToLevel[verbosity.upper()],
+                        format='%(asctime)s - %(levelname)s - %(message)s')
     logging.info("Starting the application...")
     results = asyncio.run(gather_links(url))
 
