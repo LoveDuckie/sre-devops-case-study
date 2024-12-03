@@ -70,6 +70,8 @@ class TestAsyncFunctions(AioHTTPTestCase):
             :return: A 404 Not Found response.
             :rtype: aiohttp.web.Response
             """
+            if not request:
+                raise ValueError("The request is invalid or null")
             return web.Response(status=404)
 
         app = web.Application()

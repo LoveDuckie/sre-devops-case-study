@@ -45,8 +45,6 @@ poetry -C "$PYTHON_PROJECT_PATH" run coverage html
 
 write_success "python_test" "Coverage report generated. Open 'htmlcov/index.html' to view the detailed report."
 
-write_success "python_test" "Done"
-
 popd >/dev/null 2>&1
 
 exit 0
