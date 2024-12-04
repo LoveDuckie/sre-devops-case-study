@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📚 sre-devops-case-study
+# sre-devops-case-study
 
 This project showcases the technical assignment for a company named *[REDACTED]*.
 
@@ -125,7 +125,7 @@ The project solution is divided into the following components:
 
 ---
 
-### 💻 The Application
+### The Application
 
 The **application** is a Python-based project located at:
 
@@ -150,7 +150,7 @@ Solutions/Python/link-extractor
 
 ---
 
-### 🐳 The Container Image
+### The Container Image
 
 The **container image** is based on the official Python 3.11 base image.
 
@@ -163,7 +163,7 @@ The **container image** is based on the official Python 3.11 base image.
 
 ---
 
-### ☸️ The Deployment
+### The Deployment
 
 The **deployment** leverages Kubernetes and tools like `helm` and `helmfile` to manage resources.
 
@@ -178,7 +178,7 @@ The **deployment** leverages Kubernetes and tools like `helm` and `helmfile` to 
 
 ---
 
-### 🚀 The Pipelines
+### The Pipelines
 
 The **pipelines** are implemented using GitHub Actions workflows (located in `.github`), automating the following tasks:
 
