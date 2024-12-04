@@ -31,6 +31,5 @@ fi
 write_info "deploy" "Deploying Helm Charts"
 helmfile sync
 
-
 write_success "deploy" "Done"
 exit 0

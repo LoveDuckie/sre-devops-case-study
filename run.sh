@@ -17,7 +17,7 @@ ALLOWED_RUN_TYPES=(default docker)
 DEFAULT_RUN_TYPE=default
 
 while getopts ':t:h?' opt; do
-   case $opt in
+    case $opt in
         t)
             RUN_TYPE=$OPTARG
             write_warning "run" "Run Type: \"$RUN_TYPE\""
@@ -26,13 +26,13 @@ while getopts ':t:h?' opt; do
             usage
         ;;
         :)
-            write_error "run" "-${OPTARG} requires an argument"
+            write_error "run" "\"-${OPTARG}\" requires an argument"
             usage
         ;;
         *)
             usage
         ;;
-   esac
+    esac
 done
 
 case $RUN_TYPE in
@@ -40,7 +40,7 @@ case $RUN_TYPE in
         $CURRENT_SCRIPT_DIRECTORY/run_native.sh
         exit 0
     ;;
-
+    
     docker)
         $CURRENT_SCRIPT_DIRECTORY/run_docker.sh
         exit 0
