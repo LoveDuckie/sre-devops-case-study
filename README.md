@@ -31,6 +31,16 @@ Find below an illustrative animation of the tool running as a Docker container.
 
 </div>
 
+### Running as Kubernetes Helm Chart
+
+Find below an illustrative animation of the tool running the Docker container as a Helm Chart deployed instance.
+
+<div align="center">
+
+<img src="helm-apply.gif" width="65%" />
+
+</div>
+
 ---
 
 ## 📂 Repository Layout
