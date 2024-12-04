@@ -1,0 +1,112 @@
+name: Reusable Multi-Architecture Docker Build
+
+on:
+  workflow_call:
+    inputs:
+      dockerfile:
+        description: "Path to the Dockerfile"
+        required: true
+        type: string
+      context:
+        description: "Build context directory"
+        required: true
+        type: string
+      image:
+        description: "Image name and tag"
+        required: true
+        type: string
+      version:
+        description: "Version to be appended to tag"
+        required: false
+        default: "latest"
+        type: string
+      cache_image:
+        description: "Cache image reference"
+        required: false
+        type: string
+        default: ""
+      platforms:
+        description: "Comma-separated list of target platforms"
+        required: false
+        type: string
+        default: "linux/amd64,linux/arm64"
+      build_args:
+        description: "Comma-separated list of build arguments (key=value)"
+        required: false
+        type: string
+        default: ""
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up QEMU for multi-platform builds
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      # Step 2: Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+
+      # Step 3: Log in to DockerHub or other registry
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build multi-architecture Docker image with cache
+        run: |
+          # Parse build arguments if provided
+          BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          BUILD_UID="$(uuidgen)"
+          BUILD_ARGS="--build-arg BUILD_UID=$BUILD_UID --build-arg BUILD_DATE=$BUILD_DATE"
+          if [ -n "${{ inputs.build_args }}" ]; then
+            for ARG in $(echo "${{ inputs.build_args }}" | tr ',' '\n'); do
+              BUILD_ARGS="$BUILD_ARGS --build-arg $ARG"
+            done
+          fi
+
+          # Ensure platforms are properly passed
+          PLATFORMS=${{ inputs.platforms }}
+          if [ -z "$PLATFORMS" ]; then
+            echo "No platforms provided. Using default: linux/amd64"
+            PLATFORMS="linux/amd64"
+          fi
+
+          # Ensure context is not empty
+          CONTEXT=${{ inputs.context }}
+          if [ -z "$CONTEXT" ]; then
+            echo "Build context is required but not provided."
+            exit 1
+          fi
+
+          # Run the build command
+          docker buildx build \
+            --file ${{ inputs.dockerfile }} \
+            --platform $PLATFORMS \
+            --cache-to=type=inline \
+            --cache-from=type=registry,ref=${{ inputs.cache_image }} \
+            $BUILD_ARGS \
+            --tag lucshelton/link-extractor:${{ inputs.image }}-${{ inputs.version }} \
+            --push \
+            $CONTEXT
+
+      - name: Security scan with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: lucshelton/link-extractor:${{ inputs.image }}-latest

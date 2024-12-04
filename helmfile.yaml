@@ -1,0 +1,42 @@
+repositories:
+  - name: aqua
+    url: https://aquasecurity.github.io/helm-charts/
+  - name: falco
+    url: https://falcosecurity.github.io/charts
+  - name: kubernetes-dashboard
+    url: https://kubernetes.github.io/dashboard/
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+
+releases:
+  - name: link-extractor-app-pod
+    namespace: link-extractor
+    chart: ./Helm/Charts/link-extractor-app-pod
+    values:
+      - ./Helm/Values/Python/values.yaml
+
+  - name: kubernetes-dashboard
+    namespace: kube-system
+    chart: kubernetes-dashboard/kubernetes-dashboard
+    values:
+      - ./Helm/Values/Dashboard/values.yaml
+
+  - name: falco
+    namespace: security
+    chart: falco/falco
+    values:
+      - ./Helm/Values/Falco/values.yaml
+
+  - name: trivy
+    namespace: security
+    chart: aqua/trivy
+    version: 2.0.0
+    values:
+      - ./Helm/Values/Trivy/values.yaml
+
+  - name: prometheus
+    namespace: monitoring
+    chart: prometheus-community/prometheus
+    version: "15.0.0" # Specify the chart version
+    values:
+      - ./Helm/Values/Prometheus/values.yaml # Reference to your custom values file

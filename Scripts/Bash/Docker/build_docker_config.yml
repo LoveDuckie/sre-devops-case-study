@@ -1,0 +1,7 @@
+build:
+  dotnet:
+    dockerfile: "../../../Solutions/DotNet/LinkExtractor/LinkExtractor/Dockerfile"
+    context: "../../../Solutions/DotNet/LinkExtractor"
+  python:
+    dockerfile: "../../../Solutions/Python/link-extractor/Dockerfile"
+    context: "../../../Solutions/Python/link-extractor"

@@ -1,0 +1,35 @@
+name: "Build Docker: Python"
+
+on:
+  push:
+    paths:
+      - "Solutions/Python/link-extractor/**"
+  pull_request:
+    paths:
+      - "Solutions/Python/link-extractor/**"
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: "Comma-separated list of target platforms"
+        required: false
+        type: string
+        default: "linux/amd64,linux/arm64"
+      build_args:
+        description: "Comma-separated list of build arguments (key=value)"
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  build-docker-python:
+    uses: ./.github/workflows/build_docker.yml
+    with:
+      dockerfile: ./Solutions/Python/link-extractor/Dockerfile
+      context: ./Solutions/Python/link-extractor
+      image: python
+      cache_image: link-extractor-python:cache
+      platforms: ${{ github.event.inputs.platforms }}
+      build_args: ${{ github.event.inputs.build_args }}
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

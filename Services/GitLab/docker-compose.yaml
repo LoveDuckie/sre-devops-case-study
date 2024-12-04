@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ee:latest
+    container_name: gitlab
+    hostname: 'gitlab.local'
+    ports:
+      - '81:80'
+      - '444:443'
+      - '23:23'
+    volumes:
+      - './config:/etc/gitlab'
+      - './data:/var/opt/gitlab'
+      - './logs:/var/log/gitlab'
+    restart: always
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.local'
+        # Uncomment and configure additional settings if necessary
+
+networks:
+  default:
+    name: gitlab_network

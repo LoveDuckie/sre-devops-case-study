@@ -1,0 +1,72 @@
+name: "Build, Test, and Package: .NET"
+
+on:
+  push:
+    paths:
+      - "Solutions/DotNet/LinkExtractor/**"
+  pull_request:
+    paths:
+      - "Solutions/DotNet/LinkExtractor/**"
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: "Build Configuration"
+        required: false
+        default: "Release"
+
+env:
+  DEFAULT_CONFIGURATION: Release # Default value for automated triggers
+
+jobs:
+  build-test-package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0"
+
+      - name: Determine Build Configuration
+        run: |
+          echo "CONFIGURATION=${{ github.event.inputs.configuration || env.DEFAULT_CONFIGURATION }}" >> $GITHUB_ENV
+
+      - name: Restore Dependencies
+        run: |
+          dotnet restore Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj
+
+      - name: Build Project
+        run: |
+          dotnet build Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj --configuration $CONFIGURATION --no-restore
+
+      - name: Run Unit Tests
+        run: |
+          dotnet test Solutions/DotNet/LinkExtractor/LinkExtractor.Tests/LinkExtractor.Tests.csproj --configuration $CONFIGURATION --verbosity normal
+
+      - name: Pack Project
+        run: |
+          dotnet pack Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj --configuration $CONFIGURATION --no-build --output ./nupkgs
+
+      - name: Upload NuGet Package Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: link-extractor-nuget-package
+          path: ./nupkgs/
+
+      - name: Authenticate with GitHub Packages
+        run: |
+          dotnet nuget add source \
+            --username ${{ github.actor }} \
+            --password ${{ secrets.GITHUB_TOKEN }} \
+            --store-password-in-clear-text \
+            --name github \
+            https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+
+      - name: Push Package to GitHub Packages
+        run: |
+          dotnet nuget push ./nupkgs/*.nupkg \
+            --source github \
+            --api-key ${{ secrets.GITHUB_TOKEN }}

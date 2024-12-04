@@ -1,0 +1,84 @@
+# Pull secrets for private repositories
+imagePullSecrets: []
+
+# Chart name and full name overrides
+nameOverride: ""
+fullnameOverride: ""
+
+# Pod annotations and labels
+podAnnotations: {}
+podLabels: {}
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+
+# Probes configuration
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+# Node scheduling
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Replica count for the Pod
+replicaCount: 1
+
+# Image configuration
+image:
+  repository: lucshelton/link-extractor
+  tag: latest
+  pullPolicy: Never
+
+# Pod-specific labels
+labels:
+  app.kubernetes.io/name: link-extractor
+  app.kubernetes.io/component: worker
+  app.kubernetes.io/part-of: web-crawling-suite
+  app.kubernetes.io/managed-by: Helm
+
+# Pod-specific annotations
+annotations:
+  description: "A Pod that runs the link-extractor application"
+  maintainer: "lucshelton@gmail.com"
+
+# Resources configuration
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Command and arguments for the container
+args: ["-u", "https://news.ycombinator.com/", "-o", "stdout"]
+command: []
+
+# Security context for the container
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 3000
+
+# Pod security context
+podSecurityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 3000

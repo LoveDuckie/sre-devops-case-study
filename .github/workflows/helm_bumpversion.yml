@@ -1,0 +1,38 @@
+name: Bump Helm Chart Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: "Type of version bump"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  helm-charts-bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Detect and bump chart versions
+        run: |
+          chmod +x Scripts/Bash/chart_bumpversion.sh
+          ./Scripts/Bash/chart_bumpversion.sh -t "${{ github.event.inputs.bump_type }}"
+
+      - name: Commit changes
+        run: |
+          git add Helm/Charts/**/Chart.yaml
+          git commit -m "Bump Helm chart versions [${{ github.event.inputs.bump_type }}]"
+          git push

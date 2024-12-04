@@ -1,0 +1,87 @@
+stages:
+  - build
+  - test
+  - version-bump
+  - package
+  - docker-build
+  - helm-validate
+
+variables:
+  DOCKER_IMAGE: my-app
+  CSPROJ_FILE: ./Solutions/DotNet/LinkExtractor/LinkExtractor/LinkExtractor.csproj
+  PACKAGE_OUTPUT: ./Solutions/DotNet/LinkExtractor/LinkExtractor/bin/Release/net8.0/
+  BUILDKIT_INLINE_CACHE: 1
+
+# Stage 1: Build .NET Application
+build:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - dotnet restore
+    - dotnet build --configuration Release
+  artifacts:
+    paths:
+      - ${PACKAGE_OUTPUT}
+
+# Stage 2: Run Tests
+test:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - dotnet test --no-build --verbosity normal
+
+# Stage 3: Bump Version
+version-bump:
+  stage: version-bump
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  before_script:
+    - chmod +x ./scripts/bump-version.sh
+  script:
+    - ./scripts/bump-version.sh ${CSPROJ_FILE}
+  artifacts:
+    paths:
+      - ${CSPROJ_FILE}
+
+# Stage 4: Package .NET Application
+package:
+  stage: package
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - dotnet publish ${CSPROJ_FILE} --configuration Release --output ./publish
+  artifacts:
+    paths:
+      - ./publish
+
+# Stage 5: Build Docker Image with BuildKit
+docker-build:
+  stage: docker-build
+  image: docker:23.0
+  services:
+    - docker:dind
+  variables:
+    DOCKER_BUILDKIT: 1 # Enable BuildKit
+  before_script:
+    - docker buildx version || echo "Buildx is already part of Docker 23.0+"
+    - docker buildx create --use || echo "Using existing builder"
+  script:
+    # Build the image with caching enabled
+    - docker buildx build --progress=plain \
+      --tag ${DOCKER_IMAGE}:${CI_COMMIT_SHA} \
+      --cache-to=type=inline \
+      --cache-from=type=local,src=/cache \
+      --output type=docker \
+      .
+  artifacts:
+    paths:
+      - Dockerfile
+
+# Stage 6: Validate and Package Helm Chart
+helm-validate:
+  stage: helm-validate
+  image: alpine/helm:3.11.1
+  script:
+    - helm lint ./helm-chart
+    - helm package ./helm-chart --destination ./helm-packages
+  artifacts:
+    paths:
+      - ./helm-packages

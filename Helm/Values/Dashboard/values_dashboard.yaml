@@ -1,0 +1,22 @@
+# Enable ingress for accessing the dashboard
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: dashboard.link-extractor.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: dashboard-tls
+      hosts:
+        - dashboard.link-extractor.local
+
+service:
+  type: NodePort
+
+rbac:
+  create: true
+
+metricsScraper:
+  enabled: true
