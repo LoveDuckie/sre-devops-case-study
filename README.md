@@ -9,6 +9,21 @@ This project showcases the technical assignment for a company named *[REDACTED]*
 
 ## Demonstration
 
+Find below some illustrative animations of the application in action.
+
+### Running as native Python application
+
+Find below an illustrative animation of the tool running as a native Python application.
+
+<div align="center">
+
+<img src="demo-native.gif" width="65%" />
+
+</div>
+
+### Running as Docker Container
+
+Find below an illustrative animation of the tool running as a Docker container.
 
 <div align="center">
 

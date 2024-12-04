@@ -21,6 +21,13 @@ on:
         default: ""
 
 jobs:
+  setup-build-vars:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "BUILD_DATE=\"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"" >> $GITHUB_ENV
+          echo "BUILD_UID=\"$(uuidgen)\"" >> $GITHUB_ENV
+
   build-docker-python:
     name: "Build Docker Image (Python)"
     uses: ./.github/workflows/build_docker.yml
