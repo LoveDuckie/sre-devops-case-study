@@ -9,7 +9,8 @@ This project showcases the technical assignment for a company named *[REDACTED]*
 <div align="center">
 
 [![Helm Charts: Lint, Package, and Upload](https://github.com/LoveDuckie/sre-devops-case-study/actions/workflows/helm_lint.yml/badge.svg)](https://github.com/LoveDuckie/sre-devops-case-study/actions/workflows/helm_lint.yml)
-[![Build Docker: Python](https://github.com/LoveDuckie/sre-devops-case-study/actions/workflows/build_docker_python.yml/badge.svg)](https://github.com/LoveDuckie/sre-devops-case-study/actions/workflows/build_docker_python.yml)
+[![Build Docker: Python](https://github.com/LoveDuckie/sre-devops-case-study/actions/workflows/build_docker_python.yml/badge.svg)](https://github.com/LoveDuckie/sre-devops-case-study/actions/workflows/build_docker_python.yml) 
+[![Build, Test, and Package: Python](https://github.com/LoveDuckie/sre-devops-case-study/actions/workflows/build_python.yml/badge.svg)](https://github.com/LoveDuckie/sre-devops-case-study/actions/workflows/build_python.yml)
 
 </div>
 
