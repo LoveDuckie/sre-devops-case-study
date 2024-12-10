@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "link-extractor"
-version = "0.1.4"
+version = "0.1.5"
 description = ""
 authors = ["Luc Shelton <lucshelton@gmail.com>"]
 readme = "README.md"
