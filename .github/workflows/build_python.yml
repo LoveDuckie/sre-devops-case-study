@@ -190,3 +190,5 @@ jobs:
           asset_path: dist/link_extractor-${{ env.version }}.tar.gz
           asset_name: link-extractor-v${{ env.version }}.tar.gz
           asset_content_type: application/gzip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
