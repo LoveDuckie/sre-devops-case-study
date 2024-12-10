@@ -182,6 +182,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: dist/*.tar.gz
+          asset_path: dist
           asset_name: link-extractor-v${{ env.version }}.tar.gz
           asset_content_type: application/gzip
